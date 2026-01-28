@@ -108,3 +108,4 @@ dmypy.json
 
 # uv
 .uv/
+settings.json
