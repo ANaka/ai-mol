@@ -436,9 +436,21 @@ Branch: `autodidact-improvements`
 
 ### Session Statistics
 
-- Total experiments: 17+
-- Commands tested: 50+
+- Total experiments: 20+
+- Commands tested: 60+
 - Skills created: 6
 - Server commands added: 8
-- Commits: 10+
+- Commits: 14
+
+### Additional Patterns Discovered (Session 4+)
+
+- `pepseq L` - sequence motif selection (uses single-letter codes)
+- `neighbor`/`bound_to` - bonded atom selection
+- `enable`/`disable` - toggle object visibility without changing reps
+- `show_as` - show one rep, hide others
+- `group` - organize objects into groups
+- Representation-specific colors (`stick_color`, `cartoon_color`)
+- Atom property iteration (`ss`, `b`, `q`)
+- `get_extent` - bounding box coordinates
+- `pseudoatom` - create markers at specific positions
 
