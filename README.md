@@ -147,6 +147,10 @@ Here are some examples of what you can ask Claude to do:
 ## Troubleshooting
 
 - **Connection issues**: Make sure the PyMOL plugin is listening before attempting to connect from Claude
+- **"Could not connect to PyMOL socket" error**:
+  - Ensure PyMOL's socket plugin is running and shows "Listening on port 9876"
+  - If Claude Desktop was started before PyMOL, restart Claude Desktop to allow the MCP server to establish a fresh connection
+  - In PyMOL, try stopping and restarting the socket listener (Plugin → PyMOL MCP Socket Plugin → Stop Listening, then Start Listening)
 - **Command errors**: Check the PyMOL output window for any error messages
 - **Plugin not appearing**: Restart PyMOL and check that the plugin was correctly installed
 - **Claude not connecting**: Verify the paths in your Claude configuration file are correct
