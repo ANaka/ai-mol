@@ -131,6 +131,27 @@ cmd.select("expanded", "bychain (all within 5 of ligand)")
 cmd.select("inverse", "not current_selection")
 ```
 
+### Backbone and Sidechain
+
+```python
+cmd.select("backbone", "name N+CA+C+O")
+cmd.select("sidechain", "not (name N+CA+C+O+H)")
+```
+
+### Non-Water Heteroatoms
+
+```python
+cmd.select("hetero", "hetatm and not solvent")
+```
+
+### Get Residue Range
+
+```python
+residues = []
+cmd.iterate("protein and name CA", "residues.append(int(resi))",
+            space={"residues": residues})
+print("Range: " + str(min(residues)) + "-" + str(max(residues)))
+
 ### Around vs Within
 
 ```python
