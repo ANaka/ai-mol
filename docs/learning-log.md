@@ -344,3 +344,48 @@ Branch: `autodidact-improvements`
 2. **surface_color_mode** - Setting doesn't exist (tested, failed)
 3. **Some wizard operations** - May require interactive mode
 
+---
+
+## Session 4: Interaction Analysis
+
+### Experiment 15: Salt Bridge Detection
+**Time:** 2026-01-28
+**Results:**
+- Select basic atoms: `(resn ARG and name NH1+NH2+NE) or (resn LYS and name NZ)`
+- Select acidic atoms: `(resn ASP and name OD1+OD2) or (resn GLU and name OE1+OE2)`
+- Find salt bridges: `distance salt_bridges, basic_atoms, acidic_atoms, cutoff=4.0, mode=0`
+- Works well for detecting and visualizing salt bridges
+
+---
+
+### Experiment 16: SASA Analysis
+**Time:** 2026-01-28
+**Results:**
+- `cmd.get_area("selection")` returns total SASA
+- `cmd.get_area("selection", load_b=1)` loads per-atom SASA into B-factor
+- Can then use `spectrum("b", palette)` to color by SASA
+- Buried residues: SASA < 10, Exposed: SASA > 50
+
+---
+
+### Experiment 17: Programmatic Measurements
+**Time:** 2026-01-28
+**Results:**
+- `cmd.get_distance(sel1, sel2)` returns distance value
+- `cmd.get_angle(a1, a2, a3)` returns angle
+- `cmd.get_dihedral(a1, a2, a3, a4)` returns dihedral
+- `cmd.pair_fit(mobile, target)` returns RMSD after aligning specific atoms
+
+---
+
+## Summary of Skills Created
+
+| Skill | Purpose | Key Patterns |
+|-------|---------|--------------|
+| pymol-fundamentals | Core operations | show/hide, color, select, camera |
+| binding-site-visualization | Ligand binding | organic select, within, polar contacts |
+| structure-alignment-analysis | Comparison | align, super, cealign, rms_cur |
+| publication-figures | Export | ray, bg_color, settings |
+| movie-creation | Animation | mset, mview, scene |
+| miscellaneous | Everything else | iterate, get_area, measurements |
+

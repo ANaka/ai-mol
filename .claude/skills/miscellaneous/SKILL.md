@@ -471,8 +471,51 @@ cmd.select("buried", "protein and name CA and b < 10")
 
 ---
 
+## Salt Bridges
+
+### Select Salt Bridge Atoms
+
+```python
+# Basic nitrogen atoms
+cmd.select("basic_atoms",
+    "(resn ARG and name NH1+NH2+NE) or "
+    "(resn LYS and name NZ) or "
+    "(resn HIS and name ND1+NE2)")
+
+# Acidic oxygen atoms
+cmd.select("acidic_atoms",
+    "(resn ASP and name OD1+OD2) or "
+    "(resn GLU and name OE1+OE2)")
+```
+
+### Find and Display Salt Bridges
+
+```python
+cmd.distance("salt_bridges", "basic_atoms", "acidic_atoms",
+             cutoff=4.0, mode=0)
+cmd.set("dash_color", "yellow", "salt_bridges")
+```
+
+## Aromatic Interactions
+
+### Select Aromatic Residues
+
+```python
+cmd.select("aromatic", "resn PHE+TYR+TRP")
+cmd.select("aromatic_HIS", "resn HIS")  # Sometimes aromatic
+```
+
+### Visualize Aromatic Rings
+
+```python
+cmd.show("sticks", "resn PHE+TYR+TRP")
+cmd.color("purple", "resn PHE+TYR+TRP and elem C")
+```
+
+---
+
 ## TODO: Patterns to Add
 
 - Map fitting and isosurface
 - Custom CGO objects
-- Distance matrix visualization
+- Cation-pi interactions
