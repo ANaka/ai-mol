@@ -851,15 +851,26 @@ class PyMOLConnection:
         self.sock: Optional[socket.socket] = None
 
     def connect(self) -> bool:
+        # Always create a fresh connection - don't reuse potentially stale sockets
         if self.sock:
-            return True
+            try:
+                self.sock.close()
+            except:
+                pass
+            self.sock = None
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.settimeout(5.0)  # Connection timeout
             self.sock.connect((self.host, self.port))
             logger.info(f"Connected to PyMOL at {self.host}:{self.port}")
             return True
         except Exception as e:
             logger.error(f"Connection error: {e}")
+            if self.sock:
+                try:
+                    self.sock.close()
+                except:
+                    pass
             self.sock = None
             return False
 
@@ -1065,7 +1076,6 @@ async def server_lifespan(server: FastMCP) -> AsyncIterator[dict]:
         logger.info("PyMOL MCP server shut down.")
 
 mcp = FastMCP("PyMOLMCPServer",
-              description="PyMOL integration with advanced command parsing",
               lifespan=server_lifespan)
 
 ##############################################################################
