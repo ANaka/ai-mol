@@ -348,6 +348,78 @@ cmd.set("state", 1)
 cmd.color("red", "all")
 ```
 
+## Programmatic Measurements
+
+### Get Distance (Returns Value)
+
+```python
+d = cmd.get_distance("sel1", "sel2")
+print("Distance: " + str(round(d, 2)) + " A")
+```
+
+### Get Angle
+
+```python
+a = cmd.get_angle("atom1", "atom2", "atom3")
+print("Angle: " + str(round(a, 1)) + " degrees")
+```
+
+### Get Dihedral
+
+```python
+# Backbone psi angle example
+d = cmd.get_dihedral(
+    "resi 10 and name N",
+    "resi 10 and name CA",
+    "resi 10 and name C",
+    "resi 11 and name N"
+)
+print("Psi: " + str(round(d, 1)) + " degrees")
+```
+
+### Pair Fit (Align Specific Atoms)
+
+```python
+# Align first 30 CA atoms and return RMSD
+rmsd = cmd.pair_fit(
+    "mobile and resi 1-30 and name CA",
+    "target and resi 1-30 and name CA"
+)
+print("Pair fit RMSD: " + str(round(rmsd, 2)) + " A")
+```
+
+## Finding Contacts
+
+### Select Contacting Residues
+
+```python
+# Select residues from A that contact B
+cmd.select("contact_A", "byres (chain A within 4 of chain B)")
+cmd.select("contact_B", "byres (chain B within 4 of chain A)")
+```
+
+### Iterate to Get Contact List
+
+```python
+contacts = []
+cmd.iterate(
+    "chain A within 4 of chain B",
+    "contacts.append((resi, resn))",
+    space={"contacts": contacts}
+)
+unique = list(set(contacts))
+print("Contact residues: " + str(len(unique)))
+```
+
+### Visualize Contacts
+
+```python
+cmd.select("interface", "byres (chain A within 4 of chain B) or byres (chain B within 4 of chain A)")
+cmd.show("sticks", "interface")
+cmd.color("orange", "interface and chain A")
+cmd.color("purple", "interface and chain B")
+```
+
 ---
 
 ## Known Limitations
@@ -355,6 +427,47 @@ cmd.color("red", "all")
 - **cmd.morph()** may not work reliably through socket connection
 - **Electrostatic surfaces** require APBS or similar external tools
 - **Some wizard operations** may need interactive PyMOL
+
+---
+
+## Solvent Accessible Surface Area
+
+### Calculate Total SASA
+
+```python
+total_area = cmd.get_area("selection")
+print("SASA: " + str(round(total_area, 1)) + " sq A")
+```
+
+### Color by SASA
+
+```python
+# Load SASA into B-factor column
+cmd.get_area("selection", load_b=1)
+# Color by SASA value
+cmd.spectrum("b", "blue_white_red", "selection")
+```
+
+### Find Buried Residues
+
+```python
+cmd.get_area("protein", load_b=1)
+buried = []
+cmd.iterate(
+    "protein and name CA",
+    "buried.append((resi, resn)) if b < 10 else None",
+    space={"buried": buried}
+)
+print("Buried residues: " + str(len(buried)))
+```
+
+### Select by Exposure
+
+```python
+cmd.get_area("protein", load_b=1)
+cmd.select("exposed", "protein and name CA and b > 50")
+cmd.select("buried", "protein and name CA and b < 10")
+```
 
 ---
 
