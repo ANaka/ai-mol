@@ -5,9 +5,11 @@ Provides functions for Claude Code to communicate with PyMOL via socket.
 """
 
 import json
+import os
 import shutil
 import socket
 import subprocess
+import sys
 import time
 from pathlib import Path
 
@@ -15,6 +17,12 @@ DEFAULT_HOST = "localhost"
 DEFAULT_PORT = 9876
 CONNECT_TIMEOUT = 5.0
 RECV_TIMEOUT = 30.0
+
+# Common PyMOL installation paths on macOS
+MACOS_PYMOL_PATHS = [
+    "/Applications/PyMOL.app/Contents/MacOS/PyMOL",
+    os.path.expanduser("~/Applications/PyMOL.app/Contents/MacOS/PyMOL"),
+]
 
 
 class PyMOLConnection:
@@ -112,9 +120,25 @@ class PyMOLConnection:
         raise ConnectionError("Failed to connect after 3 attempts")
 
 
+def find_pymol_executable():
+    """Find PyMOL executable path."""
+    # Check if pymol is in PATH
+    pymol_path = shutil.which("pymol")
+    if pymol_path:
+        return pymol_path
+
+    # Check macOS app locations
+    if sys.platform == "darwin":
+        for path in MACOS_PYMOL_PATHS:
+            if os.path.isfile(path) and os.access(path, os.X_OK):
+                return path
+
+    return None
+
+
 def check_pymol_installed():
     """Check if pymol command is available."""
-    return shutil.which("pymol") is not None
+    return find_pymol_executable() is not None
 
 
 def launch_pymol(file_path=None, wait_for_socket=True, timeout=10.0):
@@ -129,16 +153,18 @@ def launch_pymol(file_path=None, wait_for_socket=True, timeout=10.0):
     Returns:
         subprocess.Popen process handle
     """
-    if not check_pymol_installed():
+    pymol_exe = find_pymol_executable()
+    if not pymol_exe:
         raise RuntimeError(
-            "PyMOL not found. Please install PyMOL and ensure 'pymol' is in your PATH."
+            "PyMOL not found. Please install PyMOL and ensure it is in your PATH "
+            "or installed at /Applications/PyMOL.app (macOS)."
         )
 
     plugin_path = Path(__file__).parent / "claude_socket_plugin.py"
     if not plugin_path.exists():
         raise RuntimeError(f"Plugin not found: {plugin_path}")
 
-    cmd_args = ["pymol"]
+    cmd_args = [pymol_exe]
     if file_path:
         cmd_args.append(str(file_path))
     cmd_args.extend(["-d", f"run {plugin_path}"])
