@@ -514,6 +514,52 @@ cmd.color("purple", "resn PHE+TYR+TRP and elem C")
 
 ---
 
+## Data Extraction
+
+### Get FASTA Sequence
+
+```python
+seq = cmd.get_fastastr("object_name")
+print(seq)  # Full FASTA with header
+```
+
+### Get Residue List
+
+```python
+residues = []
+cmd.iterate(
+    "object and name CA",
+    "residues.append((resi, resn))",
+    space={"residues": residues}
+)
+print("Residues: " + str(len(residues)))
+```
+
+### Get Coordinates
+
+```python
+# Returns numpy array of shape (N, 3)
+coords = cmd.get_coords("selection")
+print("First atom: " + str(coords[0]))
+```
+
+### Center of Mass
+
+```python
+com = cmd.centerofmass("selection")
+print("Center: " + str([round(c, 2) for c in com]))
+```
+
+### Get Model Object (Full Atom Data)
+
+```python
+model = cmd.get_model("selection")
+for atom in model.atom:
+    print(f"{atom.resn} {atom.resi} {atom.name}")
+```
+
+---
+
 ## TODO: Patterns to Add
 
 - Map fitting and isosurface
