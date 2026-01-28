@@ -788,6 +788,25 @@ PYMOL_COMMANDS = {
             {"name": "command", "required": False}
         ],
         "check_selection": False
+    },
+    "mutate": {
+        "description": "Mutates a residue to a different amino acid with optional rotamer selection",
+        "pattern": r"^mutate\s+(.+?)\s*(?:,|to)\s*([A-Za-z]{3}|[A-Za-z])(?:\s*,?\s*rotamer\s*[=:]?\s*(\d+|best))?$",
+        "parameters": [
+            {"name": "selection", "required": True},
+            {"name": "target_residue", "required": True},
+            {"name": "rotamer", "required": False, "default": "best"}
+        ],
+        "check_selection": True
+    },
+    "list_rotamers": {
+        "description": "Lists available rotamers for a mutation without applying it",
+        "pattern": r"^list[_\s]?rotamers\s+(.+?)\s*(?:,|to)\s*([A-Za-z]{3}|[A-Za-z])$",
+        "parameters": [
+            {"name": "selection", "required": True},
+            {"name": "target_residue", "required": True}
+        ],
+        "check_selection": True
     }
 }
 
@@ -1031,6 +1050,48 @@ def build_pymol_code(command_name: str, param_values: Dict[str, Any]) -> str:
         color_val = param_values["color"]
         selection = param_values["selection"]
         py_code.append(f"cmd.color('{color_val}', '{selection}')")
+    elif command_name == "mutate":
+        selection = param_values["selection"]
+        target = param_values["target_residue"].upper()
+        rotamer = param_values.get("rotamer", "best")
+        # Map single letter codes to three letter codes
+        aa_map = {
+            'A': 'ALA', 'R': 'ARG', 'N': 'ASN', 'D': 'ASP', 'C': 'CYS',
+            'E': 'GLU', 'Q': 'GLN', 'G': 'GLY', 'H': 'HIS', 'I': 'ILE',
+            'L': 'LEU', 'K': 'LYS', 'M': 'MET', 'F': 'PHE', 'P': 'PRO',
+            'S': 'SER', 'T': 'THR', 'W': 'TRP', 'Y': 'TYR', 'V': 'VAL'
+        }
+        if len(target) == 1:
+            target = aa_map.get(target, target)
+        py_code.append(f"cmd.wizard('mutagenesis')")
+        py_code.append(f"cmd.get_wizard().do_select('{selection} and name CA')")
+        py_code.append(f"cmd.get_wizard().set_mode('{target}')")
+        # Handle rotamer selection
+        if rotamer and rotamer != "best":
+            # Select specific rotamer by index (1-based for user, 0-based internally)
+            py_code.append(f"cmd.get_wizard().do_pick(int({rotamer}) - 1)")
+        # "best" uses the default (lowest bump score / most common rotamer)
+        py_code.append(f"cmd.get_wizard().apply()")
+        py_code.append(f"cmd.set_wizard()")  # Close the wizard
+    elif command_name == "list_rotamers":
+        selection = param_values["selection"]
+        target = param_values["target_residue"].upper()
+        aa_map = {
+            'A': 'ALA', 'R': 'ARG', 'N': 'ASN', 'D': 'ASP', 'C': 'CYS',
+            'E': 'GLU', 'Q': 'GLN', 'G': 'GLY', 'H': 'HIS', 'I': 'ILE',
+            'L': 'LEU', 'K': 'LYS', 'M': 'MET', 'F': 'PHE', 'P': 'PRO',
+            'S': 'SER', 'T': 'THR', 'W': 'TRP', 'Y': 'TYR', 'V': 'VAL'
+        }
+        if len(target) == 1:
+            target = aa_map.get(target, target)
+        py_code.append(f"cmd.wizard('mutagenesis')")
+        py_code.append(f"cmd.get_wizard().do_select('{selection} and name CA')")
+        py_code.append(f"cmd.get_wizard().set_mode('{target}')")
+        py_code.append(f"wiz = cmd.get_wizard()")
+        py_code.append(f"rotamers = wiz.get_panel() if hasattr(wiz, 'get_panel') else []")
+        py_code.append(f"print('Available rotamers for {target}:')")
+        py_code.append(f"for i, rot in enumerate(wiz.rotamers if hasattr(wiz, 'rotamers') else [], 1): print(f'  {{i}}: {{rot}}')")
+        # Don't apply - just show rotamers, leave wizard open for user to browse
     else:
         # fallback, naive approach: "cmd.do('original command')"
         # build the original command as a string
