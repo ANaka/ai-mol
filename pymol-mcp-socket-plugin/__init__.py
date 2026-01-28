@@ -59,53 +59,64 @@ class SocketServer:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.socket.bind((self.host, self.port))
-            self.socket.listen(1)
+            self.socket.listen(5)  # Allow multiple pending connections
             self.socket.settimeout(1.0)  # 1 second timeout for accepting connections
-            
+
             print(f"PyMOL MCP Socket server listening on {self.host}:{self.port}")
-            
+
             while self.running:
                 try:
                     # Accept connection (with timeout)
-                    self.client, address = self.socket.accept()
+                    new_client, address = self.socket.accept()
                     print(f"Connected to client: {address}")
+
+                    # Close any existing client connection to allow the new one
+                    if self.client:
+                        print(f"Closing previous client connection to accept new one")
+                        try:
+                            self.client.close()
+                        except:
+                            pass
+
+                    self.client = new_client
                     self.client.settimeout(1.0)  # Set timeout for receiving data
-                    
+
                     # Handle client connection
                     buffer = b''
                     while self.running:
                         try:
                             data = self.client.recv(4096)
                             if not data:
+                                print(f"Client {address} disconnected")
                                 break  # Connection closed
-                                
+
                             buffer += data
-                            
+
                             # Try to parse JSON
                             try:
                                 command = json.loads(buffer.decode('utf-8'))
                                 buffer = b''  # Reset buffer
-                                
+
                                 # Process the command and get result
                                 result = self._handle_command(command)
-                                
+
                                 # Send response with result
                                 response = json.dumps({
-                                    "status": "success", 
+                                    "status": "success",
                                     "result": result if result else "Command executed"
                                 })
                                 self.client.sendall(response.encode('utf-8'))
                             except json.JSONDecodeError:
                                 # Incomplete JSON, continue receiving
                                 continue
-                                
+
                         except socket.timeout:
                             # Socket timeout, just continue the loop
                             continue
                         except Exception as e:
                             print(f"Error receiving data: {str(e)}")
                             break
-                    
+
                     # Close client connection
                     if self.client:
                         self.client.close()
