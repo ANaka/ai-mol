@@ -807,6 +807,82 @@ PYMOL_COMMANDS = {
             {"name": "target_residue", "required": True}
         ],
         "check_selection": True
+    },
+
+    # ALIGNMENT AND RMSD (added from autodidact learning)
+    "cealign": {
+        "description": "Structure-based alignment using Combinatorial Extension algorithm",
+        "pattern": r"^cealign\s+([^,]+)(?:\s*,\s*(.+))?$",
+        "parameters": [
+            {"name": "target", "required": True},
+            {"name": "mobile", "required": False, "default": "all"}
+        ],
+        "check_selection": True
+    },
+    "rms": {
+        "description": "Calculates RMSD between two selections without transformation",
+        "pattern": r"^rms\s+([^,]+)(?:\s*,\s*(.+))?$",
+        "parameters": [
+            {"name": "mobile", "required": True},
+            {"name": "target", "required": False, "default": "all"}
+        ],
+        "check_selection": True
+    },
+    "rms_cur": {
+        "description": "Calculates RMSD between two selections at current positions",
+        "pattern": r"^rms_cur\s+([^,]+)(?:\s*,\s*(.+))?$",
+        "parameters": [
+            {"name": "mobile", "required": True},
+            {"name": "target", "required": False, "default": "all"}
+        ],
+        "check_selection": True
+    },
+
+    # SECONDARY STRUCTURE
+    "dss": {
+        "description": "Assigns secondary structure based on geometry (replaces util.ss)",
+        "pattern": r"^dss(?:\s+(.+))?$",
+        "parameters": [
+            {"name": "selection", "required": False, "default": "all"}
+        ],
+        "check_selection": True
+    },
+
+    # MOVIE VIEWS
+    "mview": {
+        "description": "Stores or recalls movie views for animation",
+        "pattern": r"^mview\s+(store|recall|clear|interpolate)(?:\s*,\s*(.+))?$",
+        "parameters": [
+            {"name": "action", "required": True, "options": ["store", "recall", "clear", "interpolate"]},
+            {"name": "options", "required": False}
+        ],
+        "check_selection": False
+    },
+
+    # UTILITY QUERIES
+    "count_atoms": {
+        "description": "Counts atoms in a selection",
+        "pattern": r"^count_atoms\s+(.+)$",
+        "parameters": [
+            {"name": "selection", "required": True}
+        ],
+        "check_selection": True
+    },
+    "count_states": {
+        "description": "Returns the number of states in an object",
+        "pattern": r"^count_states(?:\s+(.+))?$",
+        "parameters": [
+            {"name": "object", "required": False, "default": "all"}
+        ],
+        "check_selection": False
+    },
+    "get_names": {
+        "description": "Returns list of object or selection names",
+        "pattern": r"^get_names(?:\s+(.+))?$",
+        "parameters": [
+            {"name": "type", "required": False, "default": "objects"}
+        ],
+        "check_selection": False
     }
 }
 
@@ -1092,6 +1168,49 @@ def build_pymol_code(command_name: str, param_values: Dict[str, Any]) -> str:
         py_code.append(f"print('Available rotamers for {target}:')")
         py_code.append(f"for i, rot in enumerate(wiz.rotamers if hasattr(wiz, 'rotamers') else [], 1): print(f'  {{i}}: {{rot}}')")
         # Don't apply - just show rotamers, leave wizard open for user to browse
+    # ALIGNMENT AND RMSD (added from autodidact learning)
+    elif command_name == "cealign":
+        target = param_values["target"]
+        mobile = param_values.get("mobile", "all")
+        py_code.append(f"result = cmd.cealign('{target}', '{mobile}')")
+        py_code.append(f"print('CEalign RMSD: ' + str(round(result['RMSD'], 2)) + ' A, aligned: ' + str(result['alignment_length']))")
+    elif command_name == "rms":
+        mobile = param_values["mobile"]
+        target = param_values.get("target", "all")
+        py_code.append(f"rms = cmd.rms('{mobile}', '{target}')")
+        py_code.append(f"print('RMS: ' + str(round(rms, 2)) + ' A')")
+    elif command_name == "rms_cur":
+        mobile = param_values["mobile"]
+        target = param_values.get("target", "all")
+        py_code.append(f"rms = cmd.rms_cur('{mobile}', '{target}')")
+        py_code.append(f"print('RMS (current): ' + str(round(rms, 2)) + ' A')")
+    # SECONDARY STRUCTURE
+    elif command_name == "dss":
+        selection = param_values.get("selection", "all")
+        py_code.append(f"cmd.dss('{selection}')")
+        py_code.append(f"print('Secondary structure assigned for {selection}')")
+    # MOVIE VIEWS
+    elif command_name == "mview":
+        action = param_values["action"]
+        options = param_values.get("options", "")
+        if options:
+            py_code.append(f"cmd.mview('{action}', {options})")
+        else:
+            py_code.append(f"cmd.mview('{action}')")
+        py_code.append(f"print('mview {action} executed')")
+    # UTILITY QUERIES
+    elif command_name == "count_atoms":
+        selection = param_values["selection"]
+        py_code.append(f"count = cmd.count_atoms('{selection}')")
+        py_code.append(f"print('Atoms in {selection}: ' + str(count))")
+    elif command_name == "count_states":
+        obj = param_values.get("object", "all")
+        py_code.append(f"states = cmd.count_states('{obj}')")
+        py_code.append(f"print('States in {obj}: ' + str(states))")
+    elif command_name == "get_names":
+        name_type = param_values.get("type", "objects")
+        py_code.append(f"names = cmd.get_names('{name_type}')")
+        py_code.append(f"print('Names ({name_type}): ' + str(names))")
     else:
         # fallback, naive approach: "cmd.do('original command')"
         # build the original command as a string
