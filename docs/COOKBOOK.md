@@ -262,3 +262,24 @@ Quick reference for selection syntax you can use in your requests:
 2. Hide lines for cleaner views: "Hide lines, show cartoon"
 3. Use white background for figures: "Set white background"
 4. Store important views as scenes for easy recall
+5. Remove water molecules for cleaner visualizations: "Remove solvent"
+6. For surfaces, use `cmd.rebuild()` after `show surface` to ensure proper rendering
+
+### Tested Visualization Workflows
+
+These workflows have been tested and produce good results:
+
+**Protein-Ligand Binding Site:**
+> "Fetch 1hsg, remove water, show protein as cartoon in light blue, show ligand as yellow sticks, highlight binding site residues within 4 angstroms as salmon sticks, zoom on ligand"
+
+**Structure Alignment:**
+> "Fetch 1lyz and 1hel, align them, color one cyan and one magenta, show as cartoon"
+
+**Publication Figure with Secondary Structure:**
+> "Fetch 1ubq, remove solvent, show cartoon with fancy helices, color helices marine, sheets orange, loops gray, white background, ray trace"
+
+**Charge-Colored Surface:**
+> "Fetch 1ubq, remove water, color basic residues (ARG/LYS/HIS) blue, acidic (ASP/GLU) red, others white, show surface, rebuild, ray trace"
+
+**Crystal Packing:**
+> "Fetch 1ubq, generate symmetry mates within 20 angstroms, color original cyan and mates gray"

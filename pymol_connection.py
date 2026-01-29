@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 
 DEFAULT_HOST = "localhost"
-DEFAULT_PORT = 9876
+DEFAULT_PORT = 9880  # Changed from 9876 due to zombie process holding that port
 CONNECT_TIMEOUT = 5.0
 RECV_TIMEOUT = 30.0
 

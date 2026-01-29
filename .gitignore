@@ -109,6 +109,14 @@ dmypy.json
 # uv
 .uv/
 settings.json
-.mcp.json*.cif
+.mcp.json
+
+# Structure files (downloaded during sessions)
+*.cif
 *.pdb
+
+# Scratch directory for temporary images
 scratch/
+
+# Ralph loop local state
+.claude/ralph-loop.local.md
