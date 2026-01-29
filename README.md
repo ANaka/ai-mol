@@ -131,10 +131,6 @@ Key files:
 
 Contributions welcome! This project aims to build comprehensive skills for Claude-PyMOL interaction. If you discover useful patterns or workflows, consider adding them as skills.
 
-## Community
-
-Join the Bio-MCP Community for support and discussion: https://join.slack.com/t/bio-mcpslack/shared_invite/zt-31z4pho39-K5tb6sZ1hUvrFyoPmKihAA
-
 ## License
 
 MIT License - see LICENSE file for details.
