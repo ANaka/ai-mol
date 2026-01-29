@@ -10,7 +10,7 @@ Core operations for molecular visualization through PyMOL MCP.
 
 ## Communication Protocol
 
-Commands sent to PyMOL via TCP socket on port 9876. Format:
+Commands sent to PyMOL via TCP socket on port 9880 (default). Format:
 
 ```json
 {"type": "pymol_command", "code": "from pymol import cmd; <commands>"}
@@ -258,3 +258,7 @@ cmd.hide("lines")
 - `byres` expands atom selections to complete residues
 - `mode=2` in distance shows polar contacts (H-bonds)
 - `cmd.dss()` assigns secondary structure (newer than util.ss)
+- Use `cmd.remove("solvent")` after loading to remove water molecules (cleaner visualizations)
+- Use `cmd.util.cnc()` after showing sticks to color by element (N blue, O red, S yellow)
+- Use `cmd.rebuild()` after `cmd.show("surface")` to ensure surface is generated before saving images
+- For charge-colored surfaces: color atoms by residue type first, then show surface (surface inherits atom colors)

@@ -22,11 +22,11 @@ from pymol import cmd
 
 # Global state
 _server = None
-_port = 9876
+_port = 9880
 
 
 class SocketServer:
-    def __init__(self, host='localhost', port=9876):
+    def __init__(self, host='localhost', port=9880):
         self.host = host
         self.port = port
         self.socket = None
@@ -166,7 +166,7 @@ def claude_stop():
         print("Claude socket listener was not running")
 
 
-def claude_start(port=9876):
+def claude_start(port=9880):
     """Start the Claude socket listener."""
     global _server, _port
     if _server and _server.is_running:

@@ -255,3 +255,7 @@ cmd.do("util.cbc")
 - White background is standard for journals
 - Store scenes before adjusting for different panels
 - Test colors with colorblindness simulators
+- Always `cmd.remove("solvent")` before making figures (removes water clutter)
+- Use `cmd.png(path, width, height)` instead of setting viewport to avoid resizing the GUI window
+- Set `cmd.set("specular", 0.2)` for subtle shine without glare
+- Marine (blue) + orange is a good colorblind-safe secondary structure scheme
