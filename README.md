@@ -1,171 +1,138 @@
-# PyMOL-MCP: Integrating PyMOL with Claude AI
+# PyMOL-MCP: Control PyMOL with Claude Code
 
-PyMOL-MCP connects PyMOL to Claude AI through the Model Context Protocol (MCP), enabling Claude to directly interact with and control PyMOL. This powerful integration allows for conversational structural biology, molecular visualization, and analysis through natural language.
-
-
+Control PyMOL through natural language using Claude Code. This integration enables conversational structural biology, molecular visualization, and analysis.
 
 https://github.com/user-attachments/assets/687f43dc-d45e-477e-ac2b-7438e175cb36
 
-
-
 ## Features
 
-- **Two-way communication**: Connect Claude AI to PyMOL through a socket-based server
-- **Intelligent command parsing**: Natural language processing for PyMOL commands
-- **Molecular visualization control**: Manipulate representations, colors, and views
-- **Structural analysis**: Perform measurements, alignments, and other analyses
-- **Code execution**: Run arbitrary Python code in PyMOL from Claude
+- **Natural language control**: Tell Claude what you want to visualize and it executes PyMOL commands
+- **Direct socket communication**: Claude Code talks directly to PyMOL (no intermediary server)
+- **Full PyMOL access**: Manipulate representations, colors, views, perform measurements, alignments, and more
+- **Skill-based workflows**: Built-in skills for common tasks like binding site visualization and publication figures
 
-## Installation Guide
+## Architecture
+
+```
+Claude Code → TCP Socket (port 9876) → PyMOL Plugin → cmd.* execution
+```
+
+## Quick Start
 
 ### Prerequisites
 
 - PyMOL installed on your system
-- Claude for Desktop
-- Python 3.10 or newer
-- Git
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed
+- Python 3.10+
 
-### Step 1: Install the UV Package Manager
+### Installation
 
-**On macOS:**
+1. **Clone the repository:**
 
-```bash
-brew install uv
-```
+   ```bash
+   git clone https://github.com/ANaka/pymol-mcp
+   cd pymol-mcp
+   ```
 
-**On Windows:**
+2. **Set up the PyMOL plugin:**
 
-```bash
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-set Path=C:\Users\[YourUsername]\.local\bin;%Path%
-```
+   Add this line to your `~/.pymolrc` (create it if it doesn't exist):
 
-For other platforms, visit the [UV installation guide](https://docs.astral.sh/uv/getting-started/installation/).
+   ```python
+   run /path/to/pymol-mcp/claude_socket_plugin.py
+   ```
 
-### Step 2: Clone the Repository
+   Replace `/path/to/pymol-mcp` with the actual path where you cloned the repository.
 
-```bash
-git clone https://github.com/vrtejus/pymol-mcp
-cd pymol-mcp
-```
+3. **Start using it:**
 
-### Step 3: Set Up the Environment
+   Open Claude Code in the `pymol-mcp` directory and say:
 
-Create and activate a Python virtual environment:
+   > "Open PyMOL and load structure 1UBQ"
 
-```bash
-python -m venv venv
-```
-
-**On macOS/Linux:**
-
-```bash
-source venv/bin/activate
-```
-
-**On Windows:**
-
-```bash
-venv\Scripts\activate
-```
-
-### Step 4: Install Dependencies
-
-With the virtual environment activated:
-
-```bash
-pip install mcp
-```
-
-### Step 5: Configure Claude Desktop
-
-1. Open Claude Desktop
-2. Go to Claude > Settings > Developer > Edit Config
-3. This will open the `claude_desktop_config.json` file
-4. Add the MCP server configuration:
-
-```json
-{
-  "mcpServers": {
-    "pymol": {
-      "command": "[Full path to your venv python]",
-      "args": ["[Full path to pymol_mcp_server.py]"]
-    }
-  }
-}
-```
-
-For example:
-
-```json
-{
-  "mcpServers": {
-    "pymol": {
-      "command": "/Users/username/pymol-mcp/venv/bin/python",
-      "args": ["/Users/username/pymol-mcp/pymol_mcp_server.py"]
-    }
-  }
-}
-```
-
-> **Note:** Use the actual full paths on your system. On Windows, use forward slashes (/) instead of backslashes.
-
-### Step 6: Install the PyMOL Plugin
-
-1. Open PyMOL
-2. Go to Plugin → Plugin Manager
-3. Click on "Install New Plugin" tab
-4. Select "Choose file..." and navigate to the cloned repository
-5. Select the `pymol-mcp-socket-plugin/__init__.py` file
-6. Click "Open" and follow the prompts to install the plugin
+   Claude will launch PyMOL (with the socket listener active) and load the structure.
 
 ## Usage
 
-### Starting the Connection
+### Starting a Session
 
-1. In PyMOL:
+Simply ask Claude to open PyMOL or load a structure:
 
-   - Go to Plugin → PyMOL MCP Socket Plugin
-   - Click "Start Listening"
-   - The status should change to "Listening on port 9876"
+- "Open PyMOL"
+- "Load PDB 4HHB and show as cartoon"
+- "Fetch 1UBQ from the PDB"
 
-2. In Claude Desktop:
-   - You should see a hammer icon in the tools section when chatting
-   - Click it to access the PyMOL tools
+Claude will launch PyMOL if it's not already running.
 
 ### Example Commands
 
-Here are some examples of what you can ask Claude to do:
-
-- "Load PDB 1UBQ and display it as cartoon"
 - "Color the protein by secondary structure"
-- "Highlight the active site residues with sticks representation"
-- "Align two structures and show their differences"
-- "Calculate the distance between these two residues"
-- "Save this view as a high-resolution image"
+- "Show the binding site residues within 5Å of the ligand as sticks"
+- "Align these two structures and calculate RMSD"
+- "Create a publication-quality figure with ray tracing"
+- "Make a 360° rotation movie"
+
+### PyMOL Console Commands
+
+Check or control the socket listener from PyMOL's command line:
+
+```
+claude_status   # Check if listener is running
+claude_stop     # Stop the listener
+claude_start    # Start the listener
+```
+
+### Available Skills
+
+Claude Code has built-in skills for common workflows:
+
+- **pymol-fundamentals** - Basic visualization, selections, coloring
+- **binding-site-visualization** - Protein-ligand interactions
+- **structure-alignment-analysis** - Comparing and aligning structures
+- **publication-figures** - High-quality figure export
+- **movie-creation** - Animations and rotations
 
 ## Troubleshooting
 
-- **Connection issues**: Make sure the PyMOL plugin is listening before attempting to connect from Claude
-- **"Could not connect to PyMOL socket" error**:
-  - Ensure PyMOL's socket plugin is running and shows "Listening on port 9876"
-  - If Claude Desktop was started before PyMOL, restart Claude Desktop to allow the MCP server to establish a fresh connection
-  - In PyMOL, try stopping and restarting the socket listener (Plugin → PyMOL MCP Socket Plugin → Stop Listening, then Start Listening)
-- **Command errors**: Check the PyMOL output window for any error messages
-- **Plugin not appearing**: Restart PyMOL and check that the plugin was correctly installed
-- **Claude not connecting**: Verify the paths in your Claude configuration file are correct
+### Connection Issues
 
-## Limitations & Notes
+- **"Could not connect to PyMOL"**: Make sure PyMOL is running and the plugin is loaded
+- **Check listener status**: Run `claude_status` in PyMOL's command line
+- **Restart listener**: Run `claude_stop` then `claude_start` in PyMOL
 
-- The socket connection requires both PyMOL and Claude to be running on the same machine
-- Some complex operations may need to be broken down into simpler steps
-- Always save your work before using experimental features
-- Join our Bio-MCP Community to troubleshoot, provide feedback & improve Bio-MCPS! https://join.slack.com/t/bio-mcpslack/shared_invite/zt-31z4pho39-K5tb6sZ1hUvrFyoPmKihAA
+### Plugin Not Loading
+
+- Verify the path in your `~/.pymolrc` is correct
+- Check PyMOL's output for any error messages on startup
+- Try running `run /path/to/claude_socket_plugin.py` manually in PyMOL
+
+### First-Time Setup Help
+
+Run the `/pymol-setup` skill in Claude Code for guided setup assistance.
+
+## Configuration
+
+The default socket port is **9876**. Both the plugin and Claude Code connection module use this port.
+
+Key files:
+- `claude_socket_plugin.py` - PyMOL plugin (headless, auto-loads via pymolrc)
+- `pymol_connection.py` - Python module for socket communication
+- `.claude/skills/` - Claude Code skills for PyMOL workflows
+
+## Limitations
+
+- PyMOL and Claude Code must run on the same machine (localhost connection)
+- One active connection at a time
+- Some complex multi-step operations may need guidance
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions welcome! This project aims to build comprehensive skills for Claude-PyMOL interaction. If you discover useful patterns or workflows, consider adding them as skills.
+
+## Community
+
+Join the Bio-MCP Community for support and discussion: https://join.slack.com/t/bio-mcpslack/shared_invite/zt-31z4pho39-K5tb6sZ1hUvrFyoPmKihAA
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License - see LICENSE file for details.
