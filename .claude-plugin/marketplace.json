@@ -1,0 +1,10 @@
+{
+  "name": "claudemol",
+  "description": "PyMOL visualization skills for Claude Code",
+  "plugins": [
+    {
+      "name": "claudemol-skills",
+      "path": "claude-plugin"
+    }
+  ]
+}
