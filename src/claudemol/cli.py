@@ -12,10 +12,14 @@ import sys
 from pathlib import Path
 
 from claudemol.connection import (
+    CONFIG_FILE,
     PyMOLConnection,
     check_pymol_installed,
     find_pymol_command,
+    get_config,
+    get_configured_python,
     get_plugin_path,
+    save_config,
 )
 
 
@@ -34,10 +38,13 @@ def setup_pymol():
         if "claudemol" in content or "claude_socket_plugin" in content:
             print("PyMOL already configured for claudemol.")
             print(f"Plugin: {plugin_path}")
+            # Still save config (in case Python path changed)
+            save_config({"python_path": sys.executable})
+            print(f"Saved Python path: {sys.executable}")
             return 0
 
     # Add to .pymolrc
-    run_command = f'\n# claudemol: Claude Code integration\nrun {plugin_path}\n'
+    run_command = f"\n# claudemol: Claude Code integration\nrun {plugin_path}\n"
 
     if pymolrc_path.exists():
         with open(pymolrc_path, "a") as f:
@@ -58,12 +65,21 @@ def setup_pymol():
         print("  - brew install pymol (macOS)")
         print("  - Download from https://pymol.org")
 
+    # Save Python path for SessionStart hook and skills
+    save_config({"python_path": sys.executable})
+    print(f"Saved Python path: {sys.executable}")
+
     return 0
 
 
 def check_status():
     """Check PyMOL connection status."""
     print("Checking PyMOL status...")
+
+    # Show configured Python if available
+    configured_python = get_configured_python()
+    if configured_python:
+        print(f"Configured Python: {configured_python}")
 
     # Check if PyMOL is installed
     pymol_cmd = find_pymol_command()
@@ -124,6 +140,14 @@ def show_info():
 
     pymol_cmd = find_pymol_command()
     print(f"  PyMOL command: {' '.join(pymol_cmd) if pymol_cmd else 'not found'}")
+
+    print(f"  Config file: {CONFIG_FILE}")
+    config = get_config()
+    if config:
+        for key, value in config.items():
+            print(f"  Config {key}: {value}")
+    else:
+        print("  Config: not set (run 'claudemol setup' to configure)")
 
 
 def main():

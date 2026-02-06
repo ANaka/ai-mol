@@ -17,6 +17,9 @@ DEFAULT_PORT = 9880
 CONNECT_TIMEOUT = 5.0
 RECV_TIMEOUT = 30.0
 
+CONFIG_DIR = Path.home() / ".claudemol"
+CONFIG_FILE = CONFIG_DIR / "config.json"
+
 # Common PyMOL installation paths
 PYMOL_PATHS = [
     # uv environment (created by /pymol-setup)
@@ -247,3 +250,28 @@ def connect_or_launch(file_path=None):
     process = launch_pymol(file_path=file_path)
     conn.connect()
     return conn, process
+
+
+def get_config():
+    """Read persisted claudemol config."""
+    if CONFIG_FILE.exists():
+        try:
+            return json.loads(CONFIG_FILE.read_text())
+        except (json.JSONDecodeError, OSError):
+            return {}
+    return {}
+
+
+def save_config(config):
+    """Save claudemol config."""
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    CONFIG_FILE.write_text(json.dumps(config, indent=2) + "\n")
+
+
+def get_configured_python():
+    """Get the Python path from persisted config. Returns path string or None."""
+    config = get_config()
+    python_path = config.get("python_path")
+    if python_path and os.path.isfile(python_path) and os.access(python_path, os.X_OK):
+        return python_path
+    return None

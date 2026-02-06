@@ -3,33 +3,53 @@ name: pymol
 description: Use when user runs /pymol command to launch PyMOL and establish a controllable session
 ---
 
-# Launch PyMOL Session
+# Launch / Connect to PyMOL
 
-Launch PyMOL with Claude socket plugin and establish connection.
+Establish a connection to PyMOL for molecular visualization work.
 
-## Execution
+## Connection Flow
+
+### Step 1: Check existing connection
+
+The SessionStart hook runs `claudemol status` automatically. Read its output:
+- **"Socket connection: OK"** → PyMOL is already running. Skip to Step 3.
+- **"Socket connection: Not available"** → Installed but not running. Go to Step 2.
+- **"claudemol not installed or PyMOL not running"** → Go to Step 2.
+
+### Step 2: Connect or launch
 
 ```python
-from claudemol import launch_pymol, PyMOLConnection
+from claudemol import connect_or_launch
 
-# Launch PyMOL (waits for socket to be ready)
-process = launch_pymol()
-
-# Connect
-conn = PyMOLConnection()
-conn.connect()
-print("PyMOL is running and connected")
+conn, process = connect_or_launch()
+print("Connected to PyMOL")
 ```
 
-## After Launch
+This tries connecting to an existing PyMOL first, and only launches a new instance if needed.
 
-Report to user:
-- PyMOL is running and connected
-- Ready to receive commands
+**If the import fails** (ModuleNotFoundError), claudemol may be in a project venv. Check the persisted config:
 
-Offer next steps:
-- "Load a structure" (fetch from PDB or load local file)
-- "Show me what's loaded" (list current objects)
+```python
+import json
+from pathlib import Path
+
+config_file = Path.home() / ".claudemol" / "config.json"
+if config_file.exists():
+    config = json.loads(config_file.read_text())
+    python_path = config.get("python_path")
+    print(f"claudemol Python: {python_path}")
+    # Use this python to run: {python_path} -c "from claudemol import connect_or_launch; ..."
+```
+
+If no config exists, suggest running `/pymol-setup`.
+
+### Step 3: Verify connection
+
+```python
+result = conn.execute("print('connected')")
+```
+
+**Reuse this `conn` object for all subsequent commands.** Do not create a new connection each time.
 
 ## Sending Commands
 
@@ -49,14 +69,17 @@ cmd.orient()
 result = conn.execute("print(cmd.get_names())")
 ```
 
-## If Connection Fails
+## Rules
 
-Check if PyMOL setup is complete. Suggest running `/pymol-setup` if:
-- PyMOL not found in PATH
-- Socket plugin not configured
-- Connection timeout
+- **Never use `PyMOLSession`** — its recovery mode kills existing PyMOL sessions.
+- **Never call `cmd.reinitialize()`** unless the user explicitly asks.
+- **If connection drops mid-session**, `conn.execute()` auto-reconnects. Do not create a new connection or relaunch PyMOL.
+- **If PyMOL crashes**, tell the user and offer to relaunch.
 
 ## Related Skills
 
-- @pymol-fundamentals - PyMOL command reference
-- @pymol-setup - First-time configuration
+- @pymol-fundamentals - selections, representations, colors
+- @pymol-setup - first-time configuration
+- @binding-site-visualization - ligand binding sites
+- @publication-figures - high-quality figures
+- @structure-alignment-analysis - comparing structures

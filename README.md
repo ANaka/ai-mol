@@ -8,6 +8,7 @@ Control PyMOL through natural language using Claude Code. This integration enabl
 - **Direct socket communication**: Claude Code talks directly to PyMOL (no intermediary server)
 - **Full PyMOL access**: Manipulate representations, colors, views, perform measurements, alignments, and more
 - **Skill-based workflows**: Built-in skills for common tasks like binding site visualization and publication figures
+- **Connect to anything**: Because Claude is the bridge, it can pull in data from online databases (UniProt, PDB, OPM), literature, protein language model annotations, or local analysis scripts and map them directly onto your structure
 
 ## Architecture
 
@@ -23,22 +24,47 @@ Claude Code → TCP Socket (port 9880) → PyMOL Plugin → cmd.* execution
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI installed
 - Python 3.10+
 
-### Installation
+### 1. Install claudemol
 
 ```bash
 pip install claudemol
 claudemol setup
 ```
 
-This installs the package and configures PyMOL to auto-load the socket plugin.
+This configures PyMOL to auto-load the socket plugin and saves your Python path to `~/.claudemol/config.json` so future Claude Code sessions can find it automatically.
 
-### Start Using It
+### 2. Install the Claude Code plugin
+
+```
+/plugin marketplace add ANaka/claudemol?path=claude-plugin
+/plugin install claudemol-skills
+```
+
+This gives Claude the skills and hooks to work with PyMOL.
+
+### 3. Start using it
 
 Open Claude Code and say:
 
 > "Open PyMOL and load structure 1UBQ"
 
-Claude will launch PyMOL (with the socket listener active) and load the structure.
+Claude will launch PyMOL, connect via socket, and load the structure.
+
+### Optional: Seamless permissions
+
+By default, Claude asks for approval before running each command. To auto-approve PyMOL-related commands, add to your project's `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(claudemol*)",
+      "Bash(*python*claudemol*)",
+      "Bash(pymol*)"
+    ]
+  }
+}
+```
 
 ## Usage
 
@@ -50,15 +76,15 @@ Simply ask Claude to open PyMOL or load a structure:
 - "Load PDB 4HHB and show as cartoon"
 - "Fetch 1UBQ from the PDB"
 
-Claude will launch PyMOL if it's not already running.
+Claude connects to an existing PyMOL if one is running, or launches a new instance.
 
 ### Example Commands
 
 - "Color the protein by secondary structure"
-- "Show the binding site residues within 5Å of the ligand as sticks"
+- "Show the binding site residues within 5A of the ligand as sticks"
 - "Align these two structures and calculate RMSD"
 - "Create a publication-quality figure with ray tracing"
-- "Make a 360° rotation movie"
+- "Make a 360 degree rotation movie"
 
 ### PyMOL Console Commands
 
@@ -72,7 +98,7 @@ claude_start    # Start the listener
 
 ### Available Skills
 
-Claude Code has built-in skills for common workflows:
+The plugin includes skills for common workflows:
 
 - **pymol-fundamentals** - Basic visualization, selections, coloring
 - **protein-structure-basics** - Secondary structure, B-factor, representations
@@ -81,6 +107,19 @@ Claude Code has built-in skills for common workflows:
 - **antibody-visualization** - CDR loops, epitopes, Fab structures
 - **publication-figures** - High-quality figure export
 - **movie-creation** - Animations and rotations
+
+## How It Works
+
+### Connection Lifecycle
+
+1. On session start, a hook runs `claudemol status` to check if PyMOL is reachable
+2. When you ask Claude to work with PyMOL, it uses `connect_or_launch()` — connecting to an existing instance or starting a new one
+3. Commands are sent as Python code over TCP and executed inside PyMOL via the socket plugin
+4. If the connection drops, `conn.execute()` auto-reconnects (up to 3 attempts)
+
+### Venv Support
+
+`claudemol setup` saves your Python interpreter path to `~/.claudemol/config.json`. This means claudemol works even when installed in a project virtualenv — the SessionStart hook and skills read the config to find the right Python.
 
 ## Troubleshooting
 
@@ -95,18 +134,30 @@ Claude Code has built-in skills for common workflows:
 - Run `claudemol setup` to configure PyMOL
 - Check PyMOL's output for any error messages on startup
 
+### claudemol Not Found
+
+If Claude reports `ModuleNotFoundError`, claudemol may be installed in a venv that isn't active. Fix:
+
+```bash
+# Re-run setup from the venv that has claudemol
+.venv/bin/claudemol setup
+```
+
+This updates `~/.claudemol/config.json` so future sessions find it.
+
 ### First-Time Setup Help
 
-Run the `/pymol-setup` skill in Claude Code for guided setup assistance.
+Run `/pymol-setup` in Claude Code for guided setup assistance.
 
 ## Configuration
 
-The default socket port is **9880**. Both the plugin and Claude Code connection module use this port.
+The default socket port is **9880**. Both the plugin and connection module use this port.
 
 Key files:
-- `src/claudemol/plugin.py` - PyMOL plugin (auto-loads via pymolrc)
+- `~/.pymolrc` - PyMOL startup script (loads the socket plugin)
+- `~/.claudemol/config.json` - Persisted Python path for venv discovery
+- `src/claudemol/plugin.py` - Socket listener plugin (runs inside PyMOL)
 - `src/claudemol/connection.py` - Python module for socket communication
-- `claude-plugin/skills/` - Claude Code skills for PyMOL workflows
 
 ## Limitations
 
