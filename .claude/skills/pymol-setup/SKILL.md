@@ -7,86 +7,46 @@ description: Use when connecting Claude to PyMOL, troubleshooting socket errors,
 
 Set up Claude Code to work with PyMOL.
 
-## Quick Setup (Recommended)
+## IMPORTANT: Run This First
+
+**Before doing ANYTHING else**, run this single command to discover existing installations:
 
 ```bash
-pip install claudemol
-claudemol setup
+echo "=== Project venv ===" && .venv/bin/python -c "import claudemol; print(claudemol.__file__)" 2>/dev/null || echo "not found"; echo "=== Config ===" && cat ~/.claudemol/config.json 2>/dev/null || echo "not found"; echo "=== System ===" && python3 -c "import claudemol; print(claudemol.__file__)" 2>/dev/null || echo "not found"; echo "=== PyMOL ===" && which pymol 2>/dev/null && pymol --version 2>/dev/null || echo "not found"; echo "=== pymolrc ===" && cat ~/.pymolrc 2>/dev/null || echo "not found"
 ```
 
-If claudemol is already installed in a project venv:
+Read the output carefully. **Do NOT install claudemol if it already exists in any location.**
+
+Based on the results:
+- **claudemol found in project venv** → Use `.venv/bin/python -m claudemol.cli` for all commands. Go to Step 2.
+- **claudemol found in config.json** → Use the `python_path` from config. Go to Step 2.
+- **claudemol found in system** → Use `claudemol` directly. Go to Step 2.
+- **claudemol not found anywhere** → Go to Step 1.
+- **PyMOL not found** → Ask user how they want to install it (see Step 1b).
+
+## Step 1: Install (Only If Not Found Above)
+
+### Step 1a: Install claudemol (only if not found in ANY location)
+
 ```bash
-.venv/bin/claudemol setup
+uv pip install claudemol   # if using uv
+pip install claudemol       # otherwise
 ```
 
-This:
-1. Installs the claudemol package (if needed)
-2. Configures `~/.pymolrc` to auto-load the socket plugin
-3. Saves the Python path to `~/.claudemol/config.json` for future sessions
-4. Reports status
+### Step 1b: Install PyMOL (only if not found)
 
-## What This Does
+**Ask the user** which method they prefer. Common options:
+- `brew install pymol` (macOS)
+- `pip install pymol-open-source-whl` (pre-built wheels)
+- `conda install -c conda-forge pymol-open-source`
+- System package manager (`apt install pymol`, etc.)
+- User may already have PyMOL installed elsewhere -- ask first
 
-1. Checks if claudemol is already installed (project venv, config, or system)
-2. Detects platform and checks if PyMOL is installed
-3. Installs open-source PyMOL if not found (with user consent)
-4. Configures pymolrc to auto-load the socket plugin
-5. Tests the connection
+Do not assume an installation method.
 
-## Step 1: Check for Existing claudemol Installation
+## Step 2: Run claudemol setup
 
-Before installing anything, check if claudemol is already available.
-
-**Check the project venv first** (most common case):
-```bash
-.venv/bin/python -c "import claudemol; print(claudemol.__file__)" 2>/dev/null
-```
-
-**Check saved config** from a previous setup:
-```bash
-cat ~/.claudemol/config.json 2>/dev/null
-```
-If `config.json` exists, it contains `{"python_path": "/path/to/python"}` -- use that Python to run claudemol.
-
-**Check system install** as fallback:
-```bash
-python3 -c "import claudemol; print(claudemol.__file__)" 2>/dev/null
-```
-
-If claudemol is found in any of these locations, skip to Step 3 using the discovered Python path. Do NOT run `pip install claudemol` if it is already installed somewhere.
-
-## Step 2: Check Platform & Install PyMOL
-
-Detect the operating system:
-```bash
-uname -s  # Returns: Linux, Darwin (macOS), or MINGW*/CYGWIN* (Windows)
-```
-
-Check if PyMOL is available:
-```bash
-which pymol 2>/dev/null && pymol --version
-```
-
-If PyMOL is found, skip to Step 3.
-
-If PyMOL is not found, **ask the user how they want to install it**. Common options:
-- `pip install pymol-open-source-whl` (pre-built wheels, works on Linux/macOS/Windows)
-- `conda install -c conda-forge pymol-open-source` (if user has conda/mamba)
-- System package manager (`apt install pymol`, `brew install pymol`, etc.)
-- User may already have PyMOL installed elsewhere (e.g., Schrodinger PyMOL) -- ask first
-
-Do not assume an installation method. Let the user choose.
-
-After installation, verify:
-```bash
-pymol --version
-# or if installed via pip:
-python3 -m pymol --version
-```
-
-## Step 3: Configure pymolrc
-
-Run `claudemol setup` using whichever Python has claudemol installed:
+Run `claudemol setup` using whichever Python has claudemol. This configures `~/.pymolrc` and saves the Python path to `~/.claudemol/config.json` for future sessions.
 
 ```bash
 # If claudemol is in the project venv:
@@ -99,42 +59,15 @@ claudemol setup
 /path/to/python -m claudemol.cli setup
 ```
 
-`claudemol setup` now also saves the Python path to `~/.claudemol/config.json` so future sessions can find claudemol automatically.
+## Step 3: Test Connection
 
-### Manual Configuration (only if claudemol CLI is unavailable)
+Launch PyMOL and test:
 
-PyMOL looks for startup scripts in these locations:
-- `~/.pymolrc.py` (Python script - takes precedence)
-- `~/.pymolrc` (PyMOL commands)
-
-Check existing config:
-```bash
-ls -la ~/.pymolrc.py ~/.pymolrc 2>/dev/null || echo "No pymolrc found"
-```
-
-Find the plugin path:
-```python
-from claudemol.connection import get_plugin_path
-print(get_plugin_path())
-```
-
-Add to `~/.pymolrc`:
-```
-# claudemol: Claude Code socket plugin
-run /path/to/plugin.py
-```
-
-**Important:** Use the actual absolute path from `get_plugin_path()`.
-
-## Step 4: Test Connection
-
-Launch PyMOL:
 ```bash
 pymol &
-# or: python3 -m pymol &
 ```
 
-Wait a few seconds for startup, then test connection:
+Wait a few seconds, then:
 
 ```python
 from claudemol import connect_or_launch
@@ -143,7 +76,7 @@ result = conn.execute("print('Claude connection successful!')")
 print("Setup complete!" if "successful" in result else f"Connection issue: {result}")
 ```
 
-## Step 5: Configure Permissions (Optional)
+## Step 4: Configure Permissions (Optional)
 
 Ask the user if they want seamless PyMOL commands without per-command approval. If yes, add to the project's `.claude/settings.json`:
 
@@ -159,9 +92,9 @@ Ask the user if they want seamless PyMOL commands without per-command approval. 
 }
 ```
 
-This allows: claudemol CLI commands, Python scripts that use claudemol, and PyMOL launches. If the file already exists, merge the `allow` entries.
+If the file already exists, merge the `allow` entries.
 
-## Step 6: Report Results
+## Step 5: Report Results
 
 On success, tell the user:
 - PyMOL is installed and configured
