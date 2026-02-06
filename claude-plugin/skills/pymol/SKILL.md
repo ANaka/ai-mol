@@ -14,67 +14,62 @@ Establish a connection to PyMOL for molecular visualization work.
 The SessionStart hook runs `claudemol status` automatically. Read its output:
 - **"Socket connection: OK"** → PyMOL is already running. Skip to Step 3.
 - **"Socket connection: Not available"** → Installed but not running. Go to Step 2.
-- **"claudemol not installed or PyMOL not running"** → Go to Step 2.
+- **"claudemol: not configured"** → Run `/pymol-setup` first.
 
-### Step 2: Connect or launch
+### Step 2: Launch PyMOL
 
-```python
-from claudemol import connect_or_launch
-
-conn, process = connect_or_launch()
-print("Connected to PyMOL")
+```bash
+~/.claudemol/bin/claudemol launch
 ```
 
-This tries connecting to an existing PyMOL first, and only launches a new instance if needed.
-
-**If the import fails** (ModuleNotFoundError), claudemol may be in a project venv. Check the persisted config:
-
-```python
-import json
-from pathlib import Path
-
-config_file = Path.home() / ".claudemol" / "config.json"
-if config_file.exists():
-    config = json.loads(config_file.read_text())
-    python_path = config.get("python_path")
-    print(f"claudemol Python: {python_path}")
-    # Use this python to run: {python_path} -c "from claudemol import connect_or_launch; ..."
-```
-
-If no config exists, suggest running `/pymol-setup`.
+This connects to an existing PyMOL if running, or launches a new instance.
 
 ### Step 3: Verify connection
 
-```python
-result = conn.execute("print('connected')")
+```bash
+~/.claudemol/bin/claudemol exec "print('connected')"
 ```
-
-**Reuse this `conn` object for all subsequent commands.** Do not create a new connection each time.
 
 ## Sending Commands
 
-```python
-# Fetch a structure
-conn.execute("cmd.fetch('1ubq')")
+All commands go through `~/.claudemol/bin/claudemol exec`:
 
-# Multiple commands
-conn.execute("""
+```bash
+# Fetch a structure
+~/.claudemol/bin/claudemol exec "cmd.fetch('1ubq')"
+
+# Multiple commands via heredoc
+~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
 cmd.hide('everything')
 cmd.show('cartoon')
 cmd.color('spectrum')
 cmd.orient()
-""")
+PYMOL
+)"
 
 # Get object names
-result = conn.execute("print(cmd.get_names())")
+~/.claudemol/bin/claudemol exec "print(cmd.get_names())"
 ```
+
+## Image Capture
+
+Always use `cmd.ray()` then `cmd.png()` separately:
+
+```bash
+~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
+cmd.ray(1200, 900)
+cmd.png('/tmp/figure.png')
+PYMOL
+)"
+```
+
+**Never** use `cmd.png(path, width, height)` — causes view corruption.
 
 ## Rules
 
-- **Never use `PyMOLSession`** — its recovery mode kills existing PyMOL sessions.
 - **Never call `cmd.reinitialize()`** unless the user explicitly asks.
-- **If connection drops mid-session**, `conn.execute()` auto-reconnects. Do not create a new connection or relaunch PyMOL.
-- **If PyMOL crashes**, tell the user and offer to relaunch.
+- **If PyMOL crashes**, tell the user and offer to relaunch with `~/.claudemol/bin/claudemol launch`.
+- **exec does NOT auto-launch.** If exec fails with "Cannot connect", run `launch` first.
 
 ## Related Skills
 

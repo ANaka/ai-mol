@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claudemol status 2>/dev/null || (python_path=$(python3 -c \"import json,pathlib; c=json.loads(pathlib.Path.home().joinpath('.claudemol','config.json').read_text()); print(c['python_path'])\" 2>/dev/null) && \"$python_path\" -m claudemol.cli status 2>/dev/null) || echo 'claudemol not installed or PyMOL not running'",
+            "command": "$HOME/.claudemol/bin/claudemol status 2>/dev/null || echo 'claudemol: not configured (run /pymol-setup)'",
             "timeout": 10
           }
         ]

@@ -5,9 +5,14 @@ Usage:
     claudemol setup    # Configure PyMOL to auto-load the socket plugin
     claudemol status   # Check if PyMOL is running and connected
     claudemol test     # Test the connection
+    claudemol info     # Show installation info
+    claudemol launch   # Launch PyMOL or connect to existing instance
+    claudemol exec     # Execute code in PyMOL
 """
 
 import argparse
+import os
+import stat
 import sys
 from pathlib import Path
 
@@ -15,12 +20,30 @@ from claudemol.connection import (
     CONFIG_FILE,
     PyMOLConnection,
     check_pymol_installed,
+    connect_or_launch,
     find_pymol_command,
     get_config,
     get_configured_python,
     get_plugin_path,
     save_config,
 )
+
+WRAPPER_DIR = Path.home() / ".claudemol" / "bin"
+WRAPPER_PATH = WRAPPER_DIR / "claudemol"
+
+
+def _create_wrapper_script():
+    """Create ~/.claudemol/bin/claudemol shell wrapper with baked Python path."""
+    WRAPPER_DIR.mkdir(parents=True, exist_ok=True)
+    python_path = sys.executable
+    script = f"""#!/bin/bash
+exec "{python_path}" -m claudemol.cli "$@"
+"""
+    WRAPPER_PATH.write_text(script)
+    WRAPPER_PATH.chmod(
+        WRAPPER_PATH.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH
+    )
+    return python_path
 
 
 def setup_pymol():
@@ -41,6 +64,9 @@ def setup_pymol():
             # Still save config (in case Python path changed)
             save_config({"python_path": sys.executable})
             print(f"Saved Python path: {sys.executable}")
+            # Create/update wrapper script
+            _create_wrapper_script()
+            print(f"Wrapper script: {WRAPPER_PATH}")
             return 0
 
     # Add to .pymolrc
@@ -68,6 +94,10 @@ def setup_pymol():
     # Save Python path for SessionStart hook and skills
     save_config({"python_path": sys.executable})
     print(f"Saved Python path: {sys.executable}")
+
+    # Create wrapper script
+    _create_wrapper_script()
+    print(f"Wrapper script: {WRAPPER_PATH}")
 
     return 0
 
@@ -149,34 +179,113 @@ def show_info():
     else:
         print("  Config: not set (run 'claudemol setup' to configure)")
 
+    print(f"  Wrapper script: {WRAPPER_PATH}")
+    print(f"  Wrapper exists: {WRAPPER_PATH.exists()}")
+
+
+def do_launch(args):
+    """Launch PyMOL or connect to existing instance."""
+    file_path = getattr(args, "file", None)
+    try:
+        conn, process = connect_or_launch(file_path=file_path)
+        if process:
+            print(f"Launched PyMOL (pid {process.pid})")
+        else:
+            print("Connected to existing PyMOL instance")
+        conn.disconnect()
+        return 0
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
+
+
+def do_exec(args):
+    """Execute code in PyMOL."""
+    code = getattr(args, "code", None)
+
+    # Read from positional arg or stdin
+    if code:
+        code = code
+    elif not os.isatty(sys.stdin.fileno()):
+        code = sys.stdin.read()
+    else:
+        print(
+            "Error: No code provided. Pass as argument or pipe via stdin.",
+            file=sys.stderr,
+        )
+        print("  claudemol exec \"cmd.fetch('1ubq')\"", file=sys.stderr)
+        print("  echo \"cmd.fetch('1ubq')\" | claudemol exec", file=sys.stderr)
+        return 1
+
+    if not code.strip():
+        print("Error: Empty code.", file=sys.stderr)
+        return 1
+
+    conn = PyMOLConnection()
+    try:
+        conn.connect(timeout=2.0)
+    except ConnectionError:
+        print("Error: Cannot connect to PyMOL. Is it running?", file=sys.stderr)
+        print("  Run: claudemol launch", file=sys.stderr)
+        return 1
+
+    try:
+        result = conn.execute(code)
+        if result:
+            print(result, end="" if result.endswith("\n") else "\n")
+        conn.disconnect()
+        return 0
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        conn.disconnect()
+        return 1
+
 
 def main():
     parser = argparse.ArgumentParser(
         description="claudemol: PyMOL integration for Claude Code",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog="""
-Commands:
-  setup     Configure PyMOL to auto-load the socket plugin
-  status    Check if PyMOL is running and connected
-  test      Test the connection with a simple command
-  info      Show installation info
-
-For Claude Code skills, install the claudemol-skills plugin:
-  /plugin marketplace add ANaka/claudemol?path=claude-plugin
-  /plugin install claudemol-skills
-""",
     )
-    parser.add_argument(
-        "command",
+
+    subparsers = parser.add_subparsers(dest="command")
+
+    # setup
+    subparsers.add_parser(
+        "setup", help="Configure PyMOL to auto-load the socket plugin"
+    )
+
+    # status
+    subparsers.add_parser("status", help="Check if PyMOL is running and connected")
+
+    # test
+    subparsers.add_parser("test", help="Test the connection with a simple command")
+
+    # info
+    subparsers.add_parser("info", help="Show installation info")
+
+    # launch
+    launch_parser = subparsers.add_parser(
+        "launch", help="Launch PyMOL or connect to existing instance"
+    )
+    launch_parser.add_argument(
+        "file", nargs="?", default=None, help="File to open (e.g., .pdb, .cif)"
+    )
+
+    # exec
+    exec_parser = subparsers.add_parser("exec", help="Execute code in PyMOL")
+    exec_parser.add_argument(
+        "code",
         nargs="?",
-        choices=["setup", "status", "test", "info"],
-        default="info",
-        help="Command to run",
+        default=None,
+        help="Python code to execute (or pipe via stdin)",
     )
 
     args = parser.parse_args()
 
-    if args.command == "setup":
+    if args.command is None:
+        show_info()
+        return 0
+    elif args.command == "setup":
         return setup_pymol()
     elif args.command == "status":
         return check_status()
@@ -185,6 +294,10 @@ For Claude Code skills, install the claudemol-skills plugin:
     elif args.command == "info":
         show_info()
         return 0
+    elif args.command == "launch":
+        return do_launch(args)
+    elif args.command == "exec":
+        return do_exec(args)
 
 
 if __name__ == "__main__":
