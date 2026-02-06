@@ -7,7 +7,7 @@
     {
       "name": "claudemol-skills",
       "source": "./claude-plugin",
-      "description": "PyMOL visualization skills for Claude Code"
+      "description": "PyMOL interaction skills for Claude Code"
     }
   ]
 }

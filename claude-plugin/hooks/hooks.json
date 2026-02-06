@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claudemol status 2>/dev/null || echo 'claudemol not installed or PyMOL not running'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
