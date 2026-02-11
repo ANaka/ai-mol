@@ -1,12 +1,14 @@
 ---
 name: antibody-visualization
-description: Use when visualizing antibodies, Fab fragments, CDR loops, epitopes, paratopes, or antibody-antigen complexes through PyMOL MCP.
+description: Use when visualizing antibodies, Fab fragments, CDR loops, epitopes, paratopes, or antibody-antigen complexes through PyMOL.
 version: 0.1.0
 ---
 
 # Antibody Visualization
 
 Workflows for visualizing antibodies, their binding regions, and interactions with antigens.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## CDR Loop Identification
 
@@ -140,8 +142,6 @@ cmd.png("antibody_interface.png")
 ### Fab-Antigen Complex Figure Set
 
 ```python
-from pymol import cmd
-
 # 1. Load and clean
 cmd.delete("all")
 cmd.fetch("1n8z")  # Trastuzumab Fab bound to HER2

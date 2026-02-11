@@ -1,6 +1,7 @@
 ---
 name: pymol
 description: Use when user runs /pymol command to launch PyMOL and establish a controllable session
+version: 0.1.0
 ---
 
 # Launch / Connect to PyMOL

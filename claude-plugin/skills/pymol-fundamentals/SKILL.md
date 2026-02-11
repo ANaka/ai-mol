@@ -1,20 +1,34 @@
 ---
 name: pymol-fundamentals
-description: Use when working with PyMOL through MCP for molecular visualization tasks including loading structures, creating representations, coloring, selections, and basic analysis.
+description: Use when working with PyMOL for molecular visualization tasks including loading structures, creating representations, coloring, selections, and basic analysis.
 version: 0.1.0
 ---
 
 # PyMOL Fundamentals
 
-Core operations for molecular visualization through PyMOL MCP.
+Core operations for molecular visualization through PyMOL.
 
-## Communication Protocol
+## Sending Commands
 
-Commands sent to PyMOL via TCP socket on port 9880 (default). Format:
+All commands go through the CLI wrapper. **Never use raw sockets.**
 
-```json
-{"type": "pymol_command", "code": "from pymol import cmd; <commands>"}
+```bash
+# Single command
+~/.claudemol/bin/claudemol exec "cmd.fetch('1ubq')"
+
+# Multiple commands via heredoc
+~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
+cmd.hide('everything')
+cmd.show('cartoon')
+cmd.color('spectrum')
+PYMOL
+)"
+
+# Get values back via print()
+~/.claudemol/bin/claudemol exec "print(cmd.get_names())"
 ```
+
+All `cmd.*` examples below should be sent this way.
 
 ## Loading Structures
 
@@ -124,9 +138,9 @@ cmd.color("cyan", "chain A")
 ### Utility Coloring
 
 ```python
-cmd.do("util.cbc")  # Color by chain
-cmd.do("util.cbag ligand")  # By atom, green carbons
-cmd.do("util.rainbow all")  # N-to-C rainbow
+cmd.util.cbc()  # Color by chain
+cmd.util.cbag("ligand")  # By atom, green carbons
+cmd.util.rainbow("all")  # N-to-C rainbow
 ```
 
 ### Spectrum Coloring
@@ -231,7 +245,7 @@ cmd.show("cartoon", "prot")
 cmd.hide("lines")
 cmd.show("sticks", "lig")
 cmd.show("sticks", "site")
-cmd.do("util.cbag lig")
+cmd.util.cbag("lig")
 cmd.color("yellow", "site and elem C")
 cmd.distance("contacts", "lig", "site", mode=2)
 cmd.zoom("lig", 8)

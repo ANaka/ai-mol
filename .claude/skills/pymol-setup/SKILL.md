@@ -1,6 +1,7 @@
 ---
 name: pymol-setup
 description: Use when connecting Claude to PyMOL, troubleshooting socket errors, or setting up the PyMOL integration for the first time
+version: 0.1.0
 ---
 
 # PyMOL Setup

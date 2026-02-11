@@ -1,5 +1,5 @@
 ---
-name: pymol-miscellaneous
+name: miscellaneous
 description: Collection of useful PyMOL patterns and commands that don't fit into specific workflow skills. Use as reference for edge cases and less common operations.
 version: 0.1.0
 ---
@@ -7,6 +7,8 @@ version: 0.1.0
 # Miscellaneous PyMOL Patterns
 
 Useful commands and patterns that don't fit neatly into other skills.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Object and State Information
 
@@ -216,6 +218,7 @@ cmd.select("leucines", "pepseq L")  # Find all leucines
 ```python
 cmd.select("neighbors", "neighbor resi 30 and name CA")
 cmd.select("bonded", "bound_to resi 30 and name CA")
+```
 
 ### Around vs Within
 
@@ -305,7 +308,8 @@ cmd.save("output.sdf", "selection")     # SDF
 ### Image Formats
 
 ```python
-cmd.png("image.png", width, height, dpi=300, ray=1)
+cmd.ray(width, height)
+cmd.png("image.png")
 cmd.save("image.pse")  # PyMOL session
 ```
 
@@ -744,8 +748,3 @@ cmd.set("sphere_color", "red", "selection")
 ```
 
 ---
-
-## TODO: Patterns to Add
-
-- Map fitting and isosurface
-- Custom CGO objects for box visualization

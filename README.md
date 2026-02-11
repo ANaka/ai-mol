@@ -13,7 +13,7 @@ Control PyMOL through natural language using Claude Code. This integration enabl
 ## Architecture
 
 ```
-Claude Code → TCP Socket (port 9880) → PyMOL Plugin → cmd.* execution
+Claude Code → ~/.claudemol/bin/claudemol exec → TCP Socket (port 9880) → PyMOL Plugin → cmd.* execution
 ```
 
 ## Quick Start
@@ -31,7 +31,7 @@ pip install claudemol
 claudemol setup
 ```
 
-This configures PyMOL to auto-load the socket plugin and saves your Python path to `~/.claudemol/config.json` so future Claude Code sessions can find it automatically.
+This configures `~/.pymolrc` to auto-load the socket plugin, saves your Python path to `~/.claudemol/config.json`, and creates the `~/.claudemol/bin/claudemol` wrapper script so future Claude Code sessions can find it automatically.
 
 ### 2. Install the Claude Code plugin
 
@@ -58,8 +58,7 @@ By default, Claude asks for approval before running each command. To auto-approv
 {
   "permissions": {
     "allow": [
-      "Bash(claudemol*)",
-      "Bash(*python*claudemol*)",
+      "Bash(*/.claudemol/bin/claudemol*)",
       "Bash(pymol*)"
     ]
   }
@@ -107,13 +106,14 @@ The plugin includes skills for common workflows:
 - **antibody-visualization** - CDR loops, epitopes, Fab structures
 - **publication-figures** - High-quality figure export
 - **movie-creation** - Animations and rotations
+- **miscellaneous** - Additional patterns and utility commands
 
 ## How It Works
 
 ### Connection Lifecycle
 
 1. On session start, a hook runs `claudemol status` to check if PyMOL is reachable
-2. When you ask Claude to work with PyMOL, it uses `connect_or_launch()` — connecting to an existing instance or starting a new one
+2. When you ask Claude to work with PyMOL, it uses `claudemol launch` — connecting to an existing instance or starting a new one
 3. Commands are sent as Python code over TCP and executed inside PyMOL via the socket plugin
 4. If the connection drops, `conn.execute()` auto-reconnects (up to 3 attempts)
 

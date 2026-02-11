@@ -1,12 +1,14 @@
 ---
 name: structure-alignment-analysis
-description: Use when comparing protein structures, aligning molecules, calculating RMSD, or visualizing structural differences through PyMOL MCP.
+description: Use when comparing protein structures, aligning molecules, calculating RMSD, or visualizing structural differences through PyMOL.
 version: 0.1.0
 ---
 
 # Structure Alignment & Analysis
 
 Workflows for structural comparison of proteins and other molecules.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Alignment Methods
 
@@ -167,8 +169,6 @@ for i, struct in enumerate(structures):
 ### Standard Structure Comparison
 
 ```python
-from pymol import cmd
-
 # 1. Load structures
 cmd.delete("all")
 cmd.fetch("1tim", name="reference")

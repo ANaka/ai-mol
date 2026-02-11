@@ -1,12 +1,14 @@
 ---
 name: binding-site-visualization
-description: Use when visualizing protein-ligand binding sites, drug binding pockets, active sites, or protein-small molecule interactions through PyMOL MCP.
+description: Use when visualizing protein-ligand binding sites, drug binding pockets, active sites, or protein-small molecule interactions through PyMOL.
 version: 0.1.0
 ---
 
 # Binding Site Visualization
 
 Workflows for visualizing and analyzing protein-ligand interactions.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Identifying the Ligand
 
@@ -73,11 +75,11 @@ cmd.hide("lines")
 
 # Ligand as sticks, colored by atom with green carbons
 cmd.show("sticks", "ligand")
-cmd.do("util.cbag ligand")
+cmd.util.cbag("ligand")
 
 # Pocket residues as sticks, colored by atom with white carbons
 cmd.show("sticks", "pocket")
-cmd.do("util.cbaw pocket")
+cmd.util.cbaw("pocket")
 
 # Center on binding site
 cmd.zoom("ligand", 8)
@@ -132,7 +134,7 @@ cmd.distance("contacts", "ligand", "pocket", cutoff=4.0, mode=0)
 
 ```python
 # Ligand: green carbons
-cmd.do("util.cbag ligand")
+cmd.util.cbag("ligand")
 
 # Key residues: different colors
 cmd.color("cyan", "pocket and resn ARG+LYS")  # Basic
@@ -152,8 +154,6 @@ cmd.spectrum("pc", "blue_white_red", "pocket", byres=1)
 ### Standard Binding Site Figure
 
 ```python
-from pymol import cmd
-
 # 1. Setup
 cmd.delete("all")
 cmd.fetch("1hsg")  # HIV protease with inhibitor
@@ -170,11 +170,11 @@ cmd.hide("lines")
 
 # 4. Style ligand
 cmd.show("sticks", "lig")
-cmd.do("util.cbag lig")
+cmd.util.cbag("lig")
 
 # 5. Style pocket
 cmd.show("sticks", "pocket")
-cmd.do("util.cbaw pocket")
+cmd.util.cbaw("pocket")
 
 # 6. Show interactions
 cmd.distance("hbonds", "lig", "pocket", mode=2)
@@ -216,14 +216,14 @@ Always create BOTH overview and detail figures:
 cmd.center("ligand")
 cmd.zoom("ligand", buffer=12)
 cmd.ray(1200, 900)
-cmd.png("binding_overview.png", dpi=300)
+cmd.png("binding_overview.png")
 ```
 
 **Detail Figure** - Close-up of interactions:
 ```python
 cmd.zoom("ligand", buffer=5)
 cmd.ray(1200, 900)
-cmd.png("binding_detail.png", dpi=300)
+cmd.png("binding_detail.png")
 ```
 
 ### Key Residue Highlighting

@@ -1,12 +1,14 @@
 ---
 name: publication-figures
-description: Use when creating publication-quality molecular figures with proper styling, ray tracing, and export settings through PyMOL MCP.
+description: Use when creating publication-quality molecular figures with proper styling, ray tracing, and export settings through PyMOL.
 version: 0.1.0
 ---
 
 # Publication Figures
 
 Settings and workflows for creating journal-quality molecular visualizations.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Background Settings
 
@@ -139,17 +141,20 @@ cmd.set("ray_trace_gain", 0.1)  # Edge detection
 
 ```python
 # After ray tracing
-cmd.png("/path/to/image.png", 1200, 900, dpi=300, ray=1)
+cmd.ray(1200, 900)
+cmd.png("/path/to/image.png", dpi=300)
 
 # Without ray (faster, lower quality)
-cmd.png("/path/to/image.png", 1200, 900, dpi=150, ray=0)
+cmd.draw(1200, 900)
+cmd.png("/path/to/image.png", dpi=150)
 ```
 
 ### With Ray Tracing
 
 ```python
-# Combined command
-cmd.png("/path/to/figure.png", width=2400, height=1800, dpi=300, ray=1)
+# Ray trace then save
+cmd.ray(2400, 1800)
+cmd.png("/path/to/figure.png", dpi=300)
 ```
 
 ## Scenes for Figures
@@ -167,7 +172,8 @@ cmd.scene("panel_C", "store", message="Close-up")
 ```python
 for panel in ["panel_A", "panel_B", "panel_C"]:
     cmd.scene(panel, "recall")
-    cmd.png("/path/to/" + panel + ".png", 1200, 900, dpi=300, ray=1)
+    cmd.ray(1200, 900)
+    cmd.png("/path/to/" + panel + ".png", dpi=300)
 ```
 
 ## Complete Workflow
@@ -175,8 +181,6 @@ for panel in ["panel_A", "panel_B", "panel_C"]:
 ### Standard Figure
 
 ```python
-from pymol import cmd
-
 # 1. Load and style
 cmd.fetch("1ubq")
 cmd.show("cartoon")
@@ -199,7 +203,8 @@ cmd.orient()
 cmd.zoom("all", 2)
 
 # 4. Export
-cmd.png("/path/to/figure.png", 2400, 1800, dpi=300, ray=1)
+cmd.ray(2400, 1800)
+cmd.png("/path/to/figure.png", dpi=300)
 ```
 
 ### Multi-Panel Figure
@@ -218,7 +223,8 @@ output_dir = os.path.expanduser("~/Desktop")
 
 for scene in ["overview", "detail"]:
     cmd.scene(scene, "recall")
-    cmd.png(output_dir + "/" + scene + ".png", 1200, 900, dpi=300, ray=1)
+    cmd.ray(1200, 900)
+    cmd.png(output_dir + "/" + scene + ".png", dpi=300)
 ```
 
 ## Color Recommendations
@@ -256,6 +262,6 @@ cmd.do("util.cbc")
 - Store scenes before adjusting for different panels
 - Test colors with colorblindness simulators
 - Always `cmd.remove("solvent")` before making figures (removes water clutter)
-- Use `cmd.png(path, width, height)` instead of setting viewport to avoid resizing the GUI window
+- Use `cmd.ray(w, h)` then `cmd.png(path)` — never pass dimensions to `cmd.png()` (causes view corruption)
 - Set `cmd.set("specular", 0.2)` for subtle shine without glare
 - Marine (blue) + orange is a good colorblind-safe secondary structure scheme

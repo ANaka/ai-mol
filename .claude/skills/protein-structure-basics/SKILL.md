@@ -1,12 +1,14 @@
 ---
 name: protein-structure-basics
-description: Use when visualizing protein structures, showing secondary structure, coloring by B-factor, creating surface representations, or generating basic structural figures through PyMOL MCP.
+description: Use when visualizing protein structures, showing secondary structure, coloring by B-factor, creating surface representations, or generating basic structural figures through PyMOL.
 version: 0.1.0
 ---
 
 # Protein Structure Basics
 
 Fundamental workflows for visualizing protein structures.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Representations
 
@@ -136,8 +138,6 @@ cmd.set("cartoon_smooth_loops", 1)
 ### Standard Protein Figure Set
 
 ```python
-from pymol import cmd
-
 # 1. Load and clean
 cmd.delete("all")
 cmd.fetch("1ema")  # GFP

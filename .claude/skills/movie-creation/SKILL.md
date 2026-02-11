@@ -1,12 +1,14 @@
 ---
 name: movie-creation
-description: Use when creating movies, animations, rotations, or morphing sequences in PyMOL through MCP.
+description: Use when creating movies, animations, rotations, or morphing sequences in PyMOL.
 version: 0.1.0
 ---
 
 # Movie Creation
 
 Workflows for creating animations and movies in PyMOL.
+
+> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Movie Basics
 
@@ -178,8 +180,6 @@ ffmpeg -framerate 30 -i frame%04d.png -c:v libx264 -pix_fmt yuv420p movie.mp4
 ### 360-Degree Rotation
 
 ```python
-from pymol import cmd
-
 # Setup
 cmd.delete("all")
 cmd.fetch("1ubq")
@@ -199,8 +199,6 @@ cmd.util.mroll(1, 360, 1)
 ### Zoom In/Out Animation
 
 ```python
-from pymol import cmd
-
 # Setup structure
 cmd.orient()
 cmd.mset("1 x60")
@@ -227,8 +225,6 @@ cmd.mview("interpolate", power=2)
 ### Tour of Binding Site
 
 ```python
-from pymol import cmd
-
 # Assume structure with ligand loaded
 cmd.select("lig", "organic")
 cmd.select("pocket", "byres (polymer.protein within 5 of lig)")

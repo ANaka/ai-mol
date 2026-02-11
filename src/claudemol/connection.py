@@ -22,7 +22,7 @@ CONFIG_FILE = CONFIG_DIR / "config.json"
 
 # Common PyMOL installation paths
 PYMOL_PATHS = [
-    # uv environment (created by /pymol-setup)
+    # uv environment (created by `claudemol setup`)
     os.path.expanduser("~/.pymol-env/bin/python"),
     # macOS app locations
     "/Applications/PyMOL.app/Contents/MacOS/PyMOL",
