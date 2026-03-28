@@ -207,11 +207,22 @@ def launch_pymol(file_path=None, wait_for_socket=True, timeout=10.0):
     if not plugin_path.exists():
         raise RuntimeError(f"Plugin not found: {plugin_path}")
 
-    # Build command: base pymol command + optional file + plugin
+    # Build command: base pymol command + optional file
     cmd_args = list(pymol_cmd)
     if file_path:
         cmd_args.append(str(file_path))
-    cmd_args.extend(["-d", f"run {plugin_path}"])
+
+    # Only inject plugin via -d if .pymolrc doesn't already load it
+    pymolrc = Path.home() / ".pymolrc"
+    pymolrc_loads_plugin = False
+    if pymolrc.exists():
+        try:
+            content = pymolrc.read_text()
+            pymolrc_loads_plugin = "claudemol" in content or "claude_socket_plugin" in content
+        except OSError:
+            pass
+    if not pymolrc_loads_plugin:
+        cmd_args.extend(["-d", f"run {plugin_path}"])
 
     process = subprocess.Popen(cmd_args)
 

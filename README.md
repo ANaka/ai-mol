@@ -36,7 +36,7 @@ This configures `~/.pymolrc` to auto-load the socket plugin, saves your Python p
 ### 2. Install the Claude Code plugin
 
 ```
-/plugin marketplace add ANaka/claudemol?path=claude-plugin
+/plugin marketplace add ANaka/claudemol
 /plugin install claudemol-skills
 ```
 

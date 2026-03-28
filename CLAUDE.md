@@ -66,7 +66,7 @@ claudemol setup  # Configures PyMOL + creates wrapper script
 
 **Claude Code skills:**
 ```bash
-/plugin marketplace add ANaka/claudemol?path=claude-plugin
+/plugin marketplace add ANaka/claudemol
 /plugin install claudemol-skills
 ```
 

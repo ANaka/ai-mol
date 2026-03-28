@@ -166,11 +166,26 @@ def claude_stop():
         print("Claude socket listener was not running")
 
 
+def _port_in_use(port):
+    """Check if a port is already bound."""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(('localhost', port))
+        return False
+    except OSError:
+        return True
+    finally:
+        s.close()
+
+
 def claude_start(port=9880):
     """Start the Claude socket listener."""
     global _server, _port
     if _server and _server.is_running:
         print(f"Claude socket listener already running on port {_port}")
+        return
+    if _port_in_use(port):
+        print(f"Claude socket listener already active on port {port} (skipping)")
         return
     _port = port
     _server = SocketServer(port=port)
