@@ -5,7 +5,7 @@ PyMOL visualization skills for Claude Code.
 ## Installation
 
 ```bash
-/plugin marketplace add ANaka/claudemol?path=claude-plugin
+/plugin marketplace add ANaka/claudemol
 /plugin install claudemol-skills
 ```
 
