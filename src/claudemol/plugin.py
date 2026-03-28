@@ -169,6 +169,7 @@ def claude_stop():
 def _port_in_use(port):
     """Check if a port is already bound."""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     try:
         s.bind(('localhost', port))
         return False
