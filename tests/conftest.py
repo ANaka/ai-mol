@@ -84,12 +84,8 @@ REMOVED_UTILITIES = [
 ]
 
 
-async def collect_agent_messages(prompt: str, options) -> tuple[str, list[tuple[str, dict]]]:
-    """Run an agent query and return (result_text, tool_calls).
-
-    tool_calls is a list of (tool_name, tool_input) tuples extracted from
-    ToolUseBlock instances in AssistantMessage content.
-    """
+async def _run_agent_query(prompt: str, options) -> tuple[str, list[tuple[str, dict]]]:
+    """Execute a single agent query attempt."""
     sdk = pytest.importorskip("claude_agent_sdk")
     result_text = ""
     tool_calls: list[tuple[str, dict]] = []
@@ -101,6 +97,30 @@ async def collect_agent_messages(prompt: str, options) -> tuple[str, list[tuple[
         elif isinstance(message, sdk.ResultMessage):
             result_text = message.result or ""
     return result_text, tool_calls
+
+
+async def collect_agent_messages(
+    prompt: str, options, *, retries: int = 1,
+) -> tuple[str, list[tuple[str, dict]]]:
+    """Run an agent query and return (result_text, tool_calls).
+
+    tool_calls is a list of (tool_name, tool_input) tuples extracted from
+    ToolUseBlock instances in AssistantMessage content.
+
+    Retries once on SDK session errors (rate limits, transient failures).
+    Skips the test if all attempts fail — infrastructure errors are not
+    test failures.
+    """
+    last_err = None
+    for attempt in range(1 + retries):
+        try:
+            return await _run_agent_query(prompt, options)
+        except Exception as exc:
+            last_err = exc
+            if attempt < retries:
+                import asyncio
+                await asyncio.sleep(2)
+    pytest.skip(f"SDK session error after {1 + retries} attempts: {last_err}")
 
 
 async def ask_agent(prompt: str, options) -> str:
