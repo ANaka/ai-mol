@@ -77,6 +77,13 @@ def extract_bridge_subcommands(text: str) -> set[str]:
 # Agent SDK helpers
 # ---------------------------------------------------------------------------
 
+REMOVED_UTILITIES = [
+    "pymol-agent-bridge capture",
+    "pymol-agent-bridge image",
+    "pymol-agent-bridge screenshot",
+]
+
+
 async def collect_agent_messages(prompt: str, options) -> tuple[str, list[tuple[str, dict]]]:
     """Run an agent query and return (result_text, tool_calls).
 
@@ -143,6 +150,19 @@ def haiku_options(repo_root):
     return sdk.ClaudeAgentOptions(
         cwd=str(repo_root),
         allowed_tools=["Read", "Glob", "Grep"],
+        setting_sources=["project"],
+        max_turns=4,
+        model="claude-haiku-4-5",
+    )
+
+
+@pytest.fixture
+def haiku_options_with_bash(repo_root):
+    """Haiku options with Bash access — for testing tool discipline."""
+    sdk = pytest.importorskip("claude_agent_sdk")
+    return sdk.ClaudeAgentOptions(
+        cwd=str(repo_root),
+        allowed_tools=["Read", "Glob", "Grep", "Bash"],
         setting_sources=["project"],
         max_turns=4,
         model="claude-haiku-4-5",

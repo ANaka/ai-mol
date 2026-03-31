@@ -23,6 +23,7 @@ import pytest
 sdk = pytest.importorskip("claude_agent_sdk")
 
 from conftest import (  # noqa: E402
+    REMOVED_UTILITIES,
     assert_skill_accessed,
     collect_agent_messages,
     skill_dirs_from_tool_calls,
@@ -64,21 +65,13 @@ class TestSkillDiscovery:
 class TestToolUsagePatterns:
     """Verify the agent uses appropriate tools even when Bash is available."""
 
-    async def test_prefers_read_over_bash_for_info(self, repo_root):
+    async def test_prefers_read_over_bash_for_info(self, haiku_options_with_bash):
         """When Bash is available, agent should still prefer Read/Glob/Grep
         for looking up information from skill files."""
-        options_with_bash = sdk.ClaudeAgentOptions(
-            cwd=str(repo_root),
-            allowed_tools=["Read", "Glob", "Grep", "Bash"],
-            setting_sources=["project"],
-            max_turns=4,
-            model="claude-haiku-4-5",
-        )
-
         result, tool_calls = await collect_agent_messages(
             "What are the basic PyMOL commands for loading and visualizing "
             "a protein structure? Read the relevant skill file.",
-            options_with_bash,
+            haiku_options_with_bash,
         )
         result_lower = result.lower()
 
@@ -222,7 +215,7 @@ class TestBridgeCommandConstruction:
         assert "png" in result_lower, "Should include PNG save command"
 
         # Must NOT reference removed utilities
-        for removed in ["pymol-agent-bridge capture", "pymol-agent-bridge image"]:
+        for removed in REMOVED_UTILITIES:
             assert removed not in result_lower, (
                 f"Should not reference removed utility: {removed}"
             )

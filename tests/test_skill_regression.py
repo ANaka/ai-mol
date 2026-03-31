@@ -10,16 +10,10 @@ import pytest
 
 sdk = pytest.importorskip("claude_agent_sdk")
 
-from conftest import ask_agent  # noqa: E402
+from conftest import REMOVED_UTILITIES, ask_agent  # noqa: E402
 
 
 VALID_BRIDGE_COMMANDS = {"setup", "status", "test", "info", "launch", "exec"}
-
-REMOVED_UTILITIES = [
-    "pymol-agent-bridge capture",
-    "pymol-agent-bridge image",
-    "pymol-agent-bridge screenshot",
-]
 
 
 @pytest.mark.slow
@@ -184,12 +178,21 @@ class TestGuardrailEnforcement:
         )
         result_lower = result.lower()
 
-        # Must NOT recommend the removed capture command
-        assert "pymol-agent-bridge capture" not in result_lower or (
-            "not" in result_lower or "removed" in result_lower or "doesn't" in result_lower
-            or "does not" in result_lower or "no longer" in result_lower
-            or "isn't" in result_lower or "invalid" in result_lower
-        ), "Should not recommend pymol-agent-bridge capture as a valid command"
+        # Must NOT recommend the removed capture command as valid.
+        # If the agent mentions it, it should be in a corrective context
+        # (e.g., "capture is not a valid command"). We check that the redirect
+        # to cmd.ray/cmd.png is present (below), which is the stronger signal.
+        if "pymol-agent-bridge capture" in result_lower:
+            # If mentioned, must be in a corrective/negative context nearby
+            import re
+            corrective = re.search(
+                r"(not|removed|no longer|invalid|doesn.t|does not|isn.t).{0,100}capture"
+                r"|capture.{0,100}(not|removed|no longer|invalid|doesn.t|does not|isn.t)",
+                result_lower,
+            )
+            assert corrective, (
+                "Agent mentioned 'pymol-agent-bridge capture' without corrective context"
+            )
 
         # Should redirect to the correct approach
         assert "cmd.ray" in result_lower or "cmd.png" in result_lower, (
