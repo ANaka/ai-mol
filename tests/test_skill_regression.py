@@ -6,9 +6,9 @@ They are excluded from default pytest runs — use `pytest -m slow` to run them.
 Requires: claude-agent-sdk (not yet available on PyPI as of 2026-03-30).
 """
 
-import re
-
 import pytest
+
+from conftest import extract_bridge_subcommands
 
 sdk = pytest.importorskip("claude_agent_sdk")
 
@@ -65,7 +65,7 @@ class TestBridgeCommands:
         )
 
         # Extract all subcommands mentioned
-        refs = set(re.findall(r"pymol-agent-bridge\s+(\w+)", result))
+        refs = extract_bridge_subcommands(result)
         # Filter out obvious prose words
         prose = {"is", "the", "and", "or", "not", "a", "an", "to", "in", "for", "can"}
         refs -= prose

@@ -52,15 +52,17 @@ def parse_frontmatter(path: pathlib.Path) -> dict | None:
 def extract_bridge_subcommands(text: str) -> set[str]:
     """Extract pymol-agent-bridge subcommands from text.
 
-    Only matches command-position occurrences (preceded by whitespace, backtick,
-    or quote), not path components like .../bin/pymol-agent-bridge.
+    Matches command invocations in both plain and path-prefixed forms, e.g.:
+    - pymol-agent-bridge exec
+    - ~/.pymol-agent-bridge/bin/pymol-agent-bridge exec
+    - .venv/bin/pymol-agent-bridge setup
     """
-    pattern = r'(?:^|[\s`"\'])pymol-agent-bridge\s+(\w+)'
+    pattern = r"""(?:^|[\s`"'(])(?:[^\s`"']*/)?pymol-agent-bridge\s+([A-Za-z][\w-]*)"""
     matches = re.findall(pattern, text, re.MULTILINE)
     # Filter out words that are clearly prose, not subcommands
     prose_words = {
-        "is", "connects", "connects", "the", "and", "or", "not", "tool",
+        "is", "connects", "the", "and", "or", "not", "tool",
         "socket", "plugin", "package", "binary", "wrapper", "script",
-        "already", "installed", "configured", "Python", "CLI",
+        "already", "installed", "configured", "python", "cli",
     }
-    return {m for m in matches if m.lower() not in prose_words}
+    return {m.lower() for m in matches if m.lower() not in prose_words}
