@@ -76,6 +76,10 @@ If you previously used the unified `claudemol` package:
 }
 ```
 
+## 🙏 Acknowledgments
+
+This project was originally forked from [pymol-mcp](https://github.com/colorifix/pymol-mcp) by [Colorifix](https://github.com/colorifix). The original project provided PyMOL integration via the Model Context Protocol (MCP). `claudemol` has since been substantially rewritten to use a CLI-based architecture (`pymol-agent-bridge`) and restructured as a skills-only plugin for Claude Code.
+
 ## 📜 License
 
 MIT License - see [LICENSE](LICENSE) file for details.
