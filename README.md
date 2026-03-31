@@ -10,16 +10,7 @@ This repository is **skills-only**. To talk to pymol it depends on a lightweight
 
 ## 🛠️ Installation
 
-### 1. Install the Bridge (Prerequisite)
-
-The bridge provides the underlying connection between Claude and PyMOL.
-
-```bash
-pip install pymol-agent-bridge
-pymol-agent-bridge setup
-```
-
-### 2. Install the claudemol Skills
+### 1. Install the Plugin
 
 In Claude Code, install this plugin to give Claude its structural biology expertise:
 
@@ -28,9 +19,14 @@ In Claude Code, install this plugin to give Claude its structural biology expert
 /plugin install claudemol-skills
 ```
 
-### 3. Verify Connection
+### 2. Run Setup
 
-Open PyMOL and run `/pymol-setup` in Claude Code to verify everything is working.
+Ask Claude to run `/pymol-setup`. It will walk you through everything:
+
+- **Install `pymol-agent-bridge`** — the Python library that connects Claude to PyMOL over a local socket
+- **Configure `~/.pymolrc`** — adds the bridge plugin so PyMOL listens for commands on startup
+- **Install open-source PyMOL** — if you don't already have PyMOL installed, it can help you set it up (via Homebrew, pip, conda, etc.)
+- **Verify the connection** — confirms Claude can send commands to PyMOL
 
 ## 🧬 Available Skills
 
@@ -94,7 +90,7 @@ If you previously used the unified `claudemol` package:
 
 ## 🙏 Acknowledgments
 
-This project was originally forked from [pymol-mcp](https://github.com/colorifix/pymol-mcp) by [Colorifix](https://github.com/colorifix). The original project provided PyMOL integration via the Model Context Protocol (MCP). `claudemol` has since been substantially rewritten to use a CLI-based architecture (`pymol-agent-bridge`) and restructured as a skills-only plugin for Claude Code.
+This project was originally forked from [pymol-mcp](https://github.com/vrtejus/pymol-mcp) by [vrtejus](https://github.com/vrtejus), which provided PyMOL integration via the Model Context Protocol (MCP). Also inspired by [ChatMol](https://github.com/ChatMol/ChatMol). `claudemol` has since been substantially rewritten to use a CLI-based architecture (`pymol-agent-bridge`) and restructured as a skills-only plugin for Claude Code.
 
 ## 📜 License
 
