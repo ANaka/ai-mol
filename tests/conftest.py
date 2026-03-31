@@ -17,10 +17,13 @@ def repo_root() -> pathlib.Path:
     return pathlib.Path(__file__).parent.parent
 
 
+VALID_BRIDGE_COMMANDS = {"setup", "status", "test", "info", "launch", "exec"}
+
+
 @pytest.fixture
 def valid_bridge_commands() -> set[str]:
     """Valid pymol-agent-bridge subcommands per CLAUDE.md."""
-    return {"setup", "status", "test", "info", "launch", "exec"}
+    return VALID_BRIDGE_COMMANDS
 
 
 @pytest.fixture

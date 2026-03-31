@@ -10,10 +10,7 @@ import pytest
 
 sdk = pytest.importorskip("claude_agent_sdk")
 
-from conftest import REMOVED_UTILITIES, ask_agent  # noqa: E402
-
-
-VALID_BRIDGE_COMMANDS = {"setup", "status", "test", "info", "launch", "exec"}
+from conftest import REMOVED_UTILITIES, VALID_BRIDGE_COMMANDS, ask_agent  # noqa: E402
 
 
 @pytest.mark.slow
@@ -78,7 +75,7 @@ class TestConnectionFlow:
         assert "exec" in result_lower, "Should reference exec for sending commands"
 
         # Must NOT reference removed utilities
-        for removed in ["pymol-agent-bridge capture", "pymol-agent-bridge image", "pymol_view"]:
+        for removed in [*REMOVED_UTILITIES, "pymol_view"]:
             assert removed not in result_lower, f"Should not reference removed utility: {removed}"
 
 

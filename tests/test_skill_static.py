@@ -5,7 +5,7 @@ These tests are free, deterministic, and run by default (no LLM, no API key).
 
 import pathlib
 
-from conftest import extract_bridge_subcommands, parse_frontmatter
+from conftest import REMOVED_UTILITIES, extract_bridge_subcommands, parse_frontmatter
 
 # Skills that only exist in .claude/skills/ (local dev), not distributed
 KNOWN_LOCAL_ONLY = {"rfd3", "skill-development"}
@@ -14,12 +14,8 @@ KNOWN_LOCAL_ONLY = {"rfd3", "skill-development"}
 KNOWN_NO_FRONTMATTER = {"rfd3"}
 
 # Patterns that indicate references to removed utilities
-REMOVED_PATTERNS = [
-    "pymol-agent-bridge capture",
-    "pymol-agent-bridge image",
-    "pymol-agent-bridge screenshot",
-    "pymol_view",
-]
+# Extends the shared list with patterns only relevant to static skill checks
+REMOVED_PATTERNS = REMOVED_UTILITIES + ["pymol_view"]
 
 
 def _skill_name(path: pathlib.Path) -> str:
