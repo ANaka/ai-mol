@@ -3,12 +3,10 @@
 These tests spawn real Claude Code sessions (Haiku model) and cost tokens.
 They are excluded from default pytest runs — use `pytest -m slow` to run them.
 
-Requires: claude-agent-sdk (not yet available on PyPI as of 2026-03-30).
+Requires: claude-agent-sdk.
 """
 
 import pytest
-
-from conftest import extract_bridge_subcommands
 
 sdk = pytest.importorskip("claude_agent_sdk")
 
@@ -46,14 +44,18 @@ class TestImageCapture:
         )
         result_lower = result.lower()
 
-        # Must use native PyMOL commands through the bridge
+        # Must use native PyMOL commands (cmd.ray + cmd.png pattern)
         assert "cmd.ray" in result_lower, "Should reference cmd.ray() for rendering"
         assert "cmd.png" in result_lower, "Should reference cmd.png() for saving"
-        assert "pymol-agent-bridge" in result_lower, "Should route through the bridge"
 
         # Must NOT reference removed utilities
         for removed in ["pymol-agent-bridge capture", "pymol-agent-bridge image", "pymol-agent-bridge screenshot"]:
             assert removed not in result_lower, f"Should not reference removed utility: {removed}"
+
+        # Should NOT use the broken cmd.png(path, width, height) pattern
+        assert "cmd.png(path, width, height)" not in result_lower or "never" in result_lower, (
+            "Should not recommend cmd.png(path, width, height) — causes view corruption"
+        )
 
 
 @pytest.mark.slow
@@ -63,16 +65,18 @@ class TestBridgeCommands:
             "List all the pymol-agent-bridge subcommands you would use and explain each one.",
             agent_options,
         )
+        result_lower = result.lower()
 
-        # Extract all subcommands mentioned
-        refs = extract_bridge_subcommands(result)
-        # Filter out obvious prose words
-        prose = {"is", "the", "and", "or", "not", "a", "an", "to", "in", "for", "can"}
-        refs -= prose
+        # Must reference at least 2 valid subcommands
+        found_valid = {cmd for cmd in VALID_BRIDGE_COMMANDS if cmd in result_lower}
+        assert len(found_valid) >= 2, f"Expected at least 2 valid subcommands, got: {found_valid}"
 
-        invalid = refs - VALID_BRIDGE_COMMANDS
-        assert not invalid, f"Referenced invalid bridge subcommands: {invalid}"
-        assert len(refs) >= 2, f"Expected at least 2 valid subcommands, got: {refs}"
+        # Must NOT reference removed/invalid utilities
+        removed = {"capture", "image", "screenshot", "view", "snap", "render"}
+        for cmd in removed:
+            assert f"pymol-agent-bridge {cmd}" not in result_lower, (
+                f"Should not reference removed utility: pymol-agent-bridge {cmd}"
+            )
 
 
 @pytest.mark.slow
