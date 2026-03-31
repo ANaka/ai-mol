@@ -225,7 +225,7 @@ complexa analyze config.yaml    # aggregate results + metrics
 ### Validate Config Before Running
 
 ```bash
-complexa validate design configs/search_binder_local_pipeline.yaml
+complexa validate configs/search_binder_local_pipeline.yaml
 ```
 
 ### Check Pipeline Status
@@ -286,15 +286,20 @@ print("Hotspot residues: [%s]" % ",".join(stored.hotspots))
 cmd.fetch("1nzy")
 cmd.remove("resn HOH+WAT")
 
+# Extract only the ligand and motif residues
+cmd.create("ame_lig", "organic")
+cmd.create("ame_motif", "polymer.protein and resi 25-40")
+
 # Rename ligand to L:0 on chain A (REQUIRED for AME)
-cmd.alter("organic", "chain='A'")
-cmd.alter("organic", "resn='L'")
-cmd.alter("organic", "resi='0'")
+cmd.alter("ame_lig", "chain='A'")
+cmd.alter("ame_lig", "resn='L'")
+cmd.alter("ame_lig", "resi='0'")
 
 # Motif protein goes on chain B
-cmd.alter("polymer.protein and resi 25-40", "chain='B'")
+cmd.alter("ame_motif", "chain='B'")
 
-cmd.save("/path/to/ame_input.pdb", "all")
+# Save only ligand + motif (not the full protein)
+cmd.save("/path/to/ame_input.pdb", "ame_lig or ame_motif")
 print("AME input saved — verify chain A=ligand(L:0), chain B=motif")
 ```
 

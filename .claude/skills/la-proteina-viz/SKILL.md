@@ -100,7 +100,7 @@ All configs derive from `configs/experiment_config/inference_base_release.yaml`.
 
 ### Generation Codes
 
-Defined in `configs/generation/uncod_codes.yaml`:
+Defined in `configs/generation/ucond_codes.yaml`:
 - Controls length distribution and sample count
 - Default: 100 samples per length
 
