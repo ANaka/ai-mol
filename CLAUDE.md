@@ -63,9 +63,16 @@ pymol-agent-bridge setup
 
 ## Development Commands
 
-Since this is now a skills-only repo, traditional Python tests are mostly deprecated, but the following are useful for development:
-
 ```bash
+# Run tests (static only, free — validates frontmatter, removed refs, skill sync, bridge commands)
+uv run --extra test pytest tests/
+
+# Run Agent SDK regression tests (costs tokens, requires claude-agent-sdk)
+uv run --extra test pytest tests/ -m slow
+
+# Run all tests
+uv run --extra test pytest tests/ -m ''
+
 # Check for remaining claudemol references
 grep -r "claudemol" . --exclude-dir=.git
 

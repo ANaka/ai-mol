@@ -1,0 +1,20 @@
+[project]
+name = "claudemol"
+version = "0.5.0"
+description = "Structural biology skills for Claude Code"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-asyncio",
+    # claude-agent-sdk — not yet available on PyPI as of 2026-03-30.
+    # When published, add here and uncomment Agent SDK tests.
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-m 'not slow'"
+markers = [
+    "slow: Agent SDK tests (spawns Claude sessions, costs tokens)",
+]
