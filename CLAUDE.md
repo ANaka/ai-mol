@@ -4,98 +4,77 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-claudemol integrates PyMOL (molecular visualization software) with Claude Code. It enables Claude to control PyMOL via natural language commands for structural biology and molecular visualization tasks.
+`claudemol` is a **skills-only** repository providing structural biology and molecular visualization expertise for Claude Code. It depends on `pymol-agent-bridge` for all infrastructure and connectivity.
 
 ## Repository Structure
 
 ```
 claudemol/
-├── src/claudemol/        # pip package
-│   ├── connection.py     # PyMOLConnection class
-│   ├── session.py        # Session management
-│   ├── view.py           # Visual feedback helpers
-│   ├── plugin.py         # Socket plugin (runs in PyMOL)
-│   └── cli.py            # CLI: claudemol setup|status|test|info|launch|exec
-├── claude-plugin/        # Claude Code plugin
+├── claude-plugin/        # Claude Code plugin (distributed)
 │   ├── .claude-plugin/
 │   │   └── plugin.json
-│   └── skills/           # All visualization skills
-└── .claude/skills/       # Local skills (for development)
+│   ├── hooks/
+│   │   └── hooks.json    # SessionStart hooks
+│   └── skills/           # All visualization skills (the core of this repo)
+└── .claude/skills/       # Local skills (used by Claude when working in this repo)
 ```
 
 ## Architecture
 
 ```
-Claude Code → ~/.claudemol/bin/claudemol exec → TCP Socket (port 9880) → PyMOL Plugin → cmd.* execution
+Claude Code → claudemol-skills (Expertise) → pymol-agent-bridge (Infrastructure) → PyMOL
 ```
 
-**Key components:**
+- **Expertise**: The skills in `claude-plugin/skills/` define *how* to perform complex structural biology tasks (antibody viz, binding sites, etc.).
+- **Infrastructure**: All "plumbing" is handled by the `pymol-agent-bridge` package.
 
-1. **PyMOL Plugin** (`src/claudemol/plugin.py`) - Socket listener that runs inside PyMOL
-   - Auto-loads via `~/.pymolrc` after `claudemol setup`
-   - Accepts TCP connections on localhost:9880
-   - Executes received Python code via `exec()` with output capture
-   - Commands: `claude_status`, `claude_stop`, `claude_start`
+## Dependency: `pymol-agent-bridge`
 
-2. **Connection Module** (`src/claudemol/connection.py`) - Python module for socket communication
-   - `PyMOLConnection` class handles TCP socket communication
-   - Used by CLI commands to send commands to PyMOL
+All commands are executed via the `pymol-agent-bridge` CLI. 
 
-3. **CLI** (`src/claudemol/cli.py`) - Command-line interface
-   - `setup` - Configures `~/.pymolrc` and creates `~/.claudemol/bin/claudemol` wrapper
-   - `status` - Checks if PyMOL is running and connected
-   - `test` - Tests connection with a simple command
-   - `info` - Shows installation info
-   - `launch` - Launches PyMOL or connects to existing instance
-   - `exec` - Executes code in PyMOL (positional arg or stdin)
-
-4. **Wrapper Script** (`~/.claudemol/bin/claudemol`) - Created by `claudemol setup`
-   - Bash script with baked Python path from the venv where claudemol is installed
-   - Works from any environment without import issues
-
-5. **Skills** (`claude-plugin/skills/`) - Workflow guidance for visualization tasks
-   - Distributed as Claude Code plugin separately from pip package
+- **Wrapper Path**: `~/.pymol-agent-bridge/bin/pymol-agent-bridge`
+- **Commands**: `setup`, `status`, `test`, `info`, `launch`, `exec`
+- **PyMOL Commands**: `bridge_status`, `bridge_stop`, `bridge_start`
+- **Socket**: localhost:9880
 
 ## Distribution
 
-**pip package:**
-```bash
-pip install claudemol
-claudemol setup  # Configures PyMOL + creates wrapper script
-```
-
-**Claude Code skills:**
+**Claude Code plugin:**
 ```bash
 /plugin marketplace add ANaka/claudemol
 /plugin install claudemol-skills
 ```
 
-## Known Issues
+**Prerequisite:**
+```bash
+pip install pymol-agent-bridge
+pymol-agent-bridge setup
+```
 
-**View Inflation Bug (FIXED):** When using `cmd.png(path, width, height)` with explicit dimensions, PyMOL's view matrix can become corrupted after multiple reinitialize cycles. Always use `cmd.ray(width, height)` followed by `cmd.png(path)` without dimensions to prevent this.
+## Maintenance Rules
+
+1. **Skills First**: This repo is for developing and maintaining structural biology skills. Do not add core infrastructure code here.
+2. **Canonical Patterns**:
+   - Use `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "..."` for all PyMOL commands.
+   - Use heredocs for multi-line Python code.
+   - Use `bridge_status` to check connection from within PyMOL.
+3. **Syncing Skills**: Keep `claude-plugin/skills/` (distributed) and `.claude/skills/` (local dev) in sync. 
+4. **No `claudemol` Package**: The `src/claudemol/` directory has been removed. All references to the `claudemol` binary must be updated to `pymol-agent-bridge`.
 
 ## Development Commands
 
+Since this is now a skills-only repo, traditional Python tests are mostly deprecated, but the following are useful for development:
+
 ```bash
-# Install locally for development
-pip install -e .
+# Check for remaining claudemol references
+grep -r "claudemol" . --exclude-dir=.git
 
-# Linting (ruff configured for E, F, I rules)
-ruff check src/
-ruff format src/
-
-# Type checking
-pyright
-
-# Run tests
-pytest tests/
+# Verify all skill files are present
+ls -R claude-plugin/skills/
 ```
 
 ## Key Code Patterns
 
-- `~/.claudemol/bin/claudemol exec "cmd.fetch('1ubq')"` - Send commands to PyMOL
-- `~/.claudemol/bin/claudemol launch` - Launch or connect to PyMOL
-- `from claudemol import PyMOLConnection, PyMOLSession` - Python API (used internally by CLI)
-- Global session via `get_session()` with auto-reconnect
-- Plugin handles multiple clients but only one active connection at a time
-- Local skills in `.claude/skills/` for development, `claude-plugin/skills/` for distribution
+- `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "cmd.fetch('1ubq')"`
+- `~/.pymol-agent-bridge/bin/pymol-agent-bridge launch`
+- `~/.pymol-agent-bridge/bin/pymol-agent-bridge status`

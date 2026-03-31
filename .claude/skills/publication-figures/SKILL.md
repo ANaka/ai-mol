@@ -8,7 +8,7 @@ version: 0.1.0
 
 Settings and workflows for creating journal-quality molecular visualizations.
 
-> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
+> **Send all `cmd.*` code via:** `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Background Settings
 

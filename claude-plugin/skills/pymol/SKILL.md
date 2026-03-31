@@ -12,15 +12,15 @@ Establish a connection to PyMOL for molecular visualization work.
 
 ### Step 1: Check existing connection
 
-The SessionStart hook runs `claudemol status` automatically. Read its output:
+The SessionStart hook runs `pymol-agent-bridge status` automatically. Read its output:
 - **"Socket connection: OK"** → PyMOL is already running. Skip to Step 3.
 - **"Socket connection: Not available"** → Installed but not running. Go to Step 2.
-- **"claudemol: not configured"** → Run `/pymol-setup` first.
+- **"pymol-agent-bridge: not configured"** → Run `/pymol-setup` first.
 
 ### Step 2: Launch PyMOL
 
 ```bash
-~/.claudemol/bin/claudemol launch
+~/.pymol-agent-bridge/bin/pymol-agent-bridge launch
 ```
 
 This connects to an existing PyMOL if running, or launches a new instance.
@@ -28,19 +28,19 @@ This connects to an existing PyMOL if running, or launches a new instance.
 ### Step 3: Verify connection
 
 ```bash
-~/.claudemol/bin/claudemol exec "print('connected')"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "print('connected')"
 ```
 
 ## Sending Commands
 
-All commands go through `~/.claudemol/bin/claudemol exec`:
+All commands go through `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec`:
 
 ```bash
 # Fetch a structure
-~/.claudemol/bin/claudemol exec "cmd.fetch('1ubq')"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "cmd.fetch('1ubq')"
 
 # Multiple commands via heredoc
-~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "$(cat <<'PYMOL'
 cmd.hide('everything')
 cmd.show('cartoon')
 cmd.color('spectrum')
@@ -49,7 +49,7 @@ PYMOL
 )"
 
 # Get object names
-~/.claudemol/bin/claudemol exec "print(cmd.get_names())"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "print(cmd.get_names())"
 ```
 
 ## Image Capture
@@ -57,7 +57,7 @@ PYMOL
 Always use `cmd.ray()` then `cmd.png()` separately:
 
 ```bash
-~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "$(cat <<'PYMOL'
 cmd.ray(1200, 900)
 cmd.png('/tmp/figure.png')
 PYMOL
@@ -69,7 +69,7 @@ PYMOL
 ## Rules
 
 - **Never call `cmd.reinitialize()`** unless the user explicitly asks.
-- **If PyMOL crashes**, tell the user and offer to relaunch with `~/.claudemol/bin/claudemol launch`.
+- **If PyMOL crashes**, tell the user and offer to relaunch with `~/.pymol-agent-bridge/bin/pymol-agent-bridge launch`.
 - **exec does NOT auto-launch.** If exec fails with "Cannot connect", run `launch` first.
 
 ## Related Skills

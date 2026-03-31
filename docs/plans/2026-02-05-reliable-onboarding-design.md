@@ -1,6 +1,6 @@
 # Reliable Onboarding Design
 
-**Problem:** When claudemol is installed in another project (pip package + Claude Code plugin), Claude doesn't have enough context to reliably connect to PyMOL. It makes multiple connection attempts and calls functions that kill existing PyMOL sessions.
+**Problem:** When pymol-agent-bridge is installed in another project (pip package + Claude Code plugin), Claude doesn't have enough context to reliably connect to PyMOL. It makes multiple connection attempts and calls functions that kill existing PyMOL sessions.
 
 **Root causes:**
 1. No CLAUDE.md ships with the plugin — Claude has no persistent baseline context
@@ -23,7 +23,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "claudemol status 2>/dev/null || echo 'claudemol not installed or PyMOL not running'",
+            "command": "pymol-agent-bridge status 2>/dev/null || echo 'pymol-agent-bridge not installed or PyMOL not running'",
             "timeout": 10
           }
         ]
@@ -33,7 +33,7 @@
 }
 ```
 
-Runs `claudemol status` on every session start. Claude sees PyMOL install location + connection status automatically. No caching needed — always fresh, ~1 second.
+Runs `pymol-agent-bridge status` on every session start. Claude sees PyMOL install location + connection status automatically. No caching needed — always fresh, ~1 second.
 
 ### 2. Plugin CLAUDE.md
 
@@ -41,7 +41,7 @@ Runs `claudemol status` on every session start. Claude sees PyMOL install locati
 
 Persistent baseline context (~30 lines). Contains:
 
-- What claudemol is (TCP socket on localhost:9880)
+- What pymol-agent-bridge is (TCP socket on localhost:9880)
 - Connection rules:
   - Check status first (hook output)
   - Never kill existing PyMOL sessions

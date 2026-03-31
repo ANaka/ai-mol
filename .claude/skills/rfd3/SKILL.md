@@ -1,10 +1,10 @@
 # RFD3 Interactive Config Builder with PyMOL
 
-This document guides Claude Code + PyMOL (claudemol) through interactive construction and visualization of RFD3 protein design configurations.
+This document guides Claude Code + PyMOL (pymol-agent-bridge) through interactive construction and visualization of RFD3 protein design configurations.
 
 ## Prerequisites
 
-- PyMOL running with the claudemol socket plugin (run `claudemol setup`)
+- PyMOL running with the pymol-agent-bridge socket plugin (run `pymol-agent-bridge setup`)
 - Structure file (PDB or CIF) to design around
 
 ## Quick Reference: Color Scheme
@@ -298,7 +298,7 @@ spec = config.spec.to_foundry_dict()  # Dict ready for RFD3 JSON input
 
 ## Structure Preparation and Sanitization
 
-Before using a structure with RFD3, it often needs to be cleaned up. The claudemol tool should help identify and remove unwanted components.
+Before using a structure with RFD3, it often needs to be cleaned up. The pymol-agent-bridge tool should help identify and remove unwanted components.
 
 ### Validating Residue Numbering (CRITICAL)
 
@@ -1435,4 +1435,4 @@ Before finalizing a design config, verify:
 - [RFD3 Protein Binder Design](https://github.com/RosettaCommons/foundry/blob/production/models/rfd3/docs/protein_binder_design.md)
 - [RFD3 Small Molecule Binder Design](https://github.com/RosettaCommons/foundry/blob/production/models/rfd3/docs/sm_binder_design.md)
 - [RFD3 Nucleic Acid Binder Design](https://github.com/RosettaCommons/foundry/blob/production/models/rfd3/docs/na_binder_design.md)
-- [claudemol PyMOL Integration](https://github.com/ANaka/claudemol)
+- [pymol-agent-bridge PyMOL Integration](https://github.com/ANaka/pymol-agent-bridge)

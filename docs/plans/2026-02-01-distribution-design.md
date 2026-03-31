@@ -1,10 +1,10 @@
-# claudemol Distribution Design
+# pymol-agent-bridge Distribution Design
 
 ## Decision
 
 Monorepo with two distribution paths:
-- **pip package** (`claudemol`) for PyMOL plugin + connection code
-- **Claude Code plugin** (`claudemol-skills`) for skills, distributed from same repo
+- **pip package** (`pymol-agent-bridge`) for PyMOL plugin + connection code
+- **Claude Code plugin** (`pymol-agent-bridge-skills`) for skills, distributed from same repo
 
 ## Target Users
 
@@ -15,16 +15,16 @@ Both:
 ## Repository Structure
 
 ```
-claudemol/
+pymol-agent-bridge/
 ├── pyproject.toml              # pip package config
 ├── src/
-│   └── claudemol/
+│   └── pymol-agent-bridge/
 │       ├── __init__.py
 │       ├── connection.py       # PyMOLConnection class
 │       ├── session.py          # Session management
 │       ├── view.py             # View utilities
 │       ├── plugin.py           # Socket plugin (copied to PyMOL)
-│       └── cli.py              # Entry point for `claudemol setup`
+│       └── cli.py              # Entry point for `pymol-agent-bridge setup`
 ├── claude-plugin/              # Claude Code plugin
 │   ├── .claude-plugin/
 │   │   └── plugin.json
@@ -41,20 +41,20 @@ claudemol/
 ### pip package
 
 ```bash
-pip install claudemol
-claudemol setup  # Installs PyMOL plugin, configures ~/.pymolrc
+pip install pymol-agent-bridge
+pymol-agent-bridge setup  # Installs PyMOL plugin, configures ~/.pymolrc
 ```
 
 Package includes:
-- `claudemol.connection` - Socket communication with PyMOL
-- `claudemol.session` - Session management utilities
-- CLI command `claudemol setup` to configure PyMOL
+- `pymol-agent-bridge.connection` - Socket communication with PyMOL
+- `pymol-agent-bridge.session` - Session management utilities
+- CLI command `pymol-agent-bridge setup` to configure PyMOL
 
 ### Claude Code plugin
 
 ```bash
-/plugin marketplace add ANaka/claudemol?path=claude-plugin
-/plugin install claudemol-skills
+/plugin marketplace add ANaka/pymol-agent-bridge?path=claude-plugin
+/plugin install pymol-agent-bridge-skills
 ```
 
 Plugin includes:
@@ -64,14 +64,14 @@ Plugin includes:
 ## User Flows
 
 **PyMOL user discovers pip package:**
-1. `pip install claudemol`
-2. `claudemol setup`
+1. `pip install pymol-agent-bridge`
+2. `pymol-agent-bridge setup`
 3. README mentions: "For Claude Code users, install the skills plugin"
 
 **Claude Code user discovers skills plugin:**
 1. `/plugin marketplace add ...`
-2. `/plugin install claudemol-skills`
-3. Plugin README says: "Requires `pip install claudemol && claudemol setup`"
+2. `/plugin install pymol-agent-bridge-skills`
+3. Plugin README says: "Requires `pip install pymol-agent-bridge && pymol-agent-bridge setup`"
 
 ## Versioning
 

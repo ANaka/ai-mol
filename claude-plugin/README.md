@@ -1,4 +1,4 @@
-# claudemol Skills for Claude Code
+# pymol-agent-bridge Skills for Claude Code
 
 PyMOL visualization skills for Claude Code.
 
@@ -13,11 +13,11 @@ Then restart Claude Code.
 
 ## Prerequisites
 
-You need the `claudemol` pip package installed:
+You need the `pymol-agent-bridge` pip package installed:
 
 ```bash
-pip install claudemol
-claudemol setup
+pip install pymol-agent-bridge
+pymol-agent-bridge setup
 ```
 
 ## Available Skills

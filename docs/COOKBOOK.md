@@ -1,13 +1,13 @@
 # PyMOL + Claude Cookbook
 
-A task-oriented guide to what Claude can do with PyMOL through claudemol.
+A task-oriented guide to what Claude can do with PyMOL through pymol-agent-bridge.
 
 ## Quick Start
 
 ### Connecting PyMOL to Claude
 
-1. Install claudemol: `pip install claudemol`
-2. Run setup: `claudemol setup`
+1. Install pymol-agent-bridge: `pip install pymol-agent-bridge`
+2. Run setup: `pymol-agent-bridge setup`
 3. Launch PyMOL - the plugin auto-starts
 4. In Claude Code, say "open PyMOL" or load a structure directly
 5. You're ready to go!

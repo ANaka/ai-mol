@@ -1,7 +1,7 @@
 {
   "name": "claudemol-skills",
-  "version": "0.4.1",
-  "description": "PyMOL visualization skills for Claude Code - molecular visualization workflows for structural biology",
+  "version": "0.5.0",
+  "description": "PyMOL visualization skills for Claude Code - molecular visualization workflows for structural biology via pymol-agent-bridge",
   "author": {
     "name": "Alex Naka"
   },
