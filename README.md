@@ -23,7 +23,9 @@ Ask Claude to run `/pymol-setup`. It will do the following:
 2. **Add a pymol plugin to you `~/.pymolrc`** — puts a socket in PyMOL so it can hear your agent.
 3. **Verify the connection** — confirms your agent can send commands to PyMOL
 
-If you don't have [pymol-open-source](https://github.com/schrodinger/pymol-open-source) it can also help you install it. 
+If you don't have [pymol-open-source](https://github.com/schrodinger/pymol-open-source) it can also help you install it.
+
+Pairs well with [protein-design-skills](https://github.com/adaptyvbio/protein-design-skills).
 
 ## 🧬 Available Skills
 
@@ -57,6 +59,7 @@ La-Proteina:          la-proteina-viz → alphafold-validation → design-compar
 Proteina-Complexa:    proteina-complexa-viz → alphafold-validation → design-interface-analysis
 Batch QC:             alphafold-validation + design-comparison
 ```
+
 
 ## 🙏 Acknowledgments
 
