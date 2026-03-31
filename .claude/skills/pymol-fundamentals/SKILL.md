@@ -264,6 +264,55 @@ cmd.show("cartoon", "all")
 cmd.hide("lines")
 ```
 
+## Image Capture
+
+### The Correct Pattern
+
+**Always** render with `cmd.ray()` first, then save with `cmd.png()` — never pass width/height to `cmd.png()`.
+
+```python
+# CORRECT: ray first, then png without dimensions
+cmd.ray(1200, 900)
+cmd.png("/path/to/image.png")
+
+# WRONG — causes view corruption:
+# cmd.png("/path/to/image.png", 1200, 900)
+```
+
+**Why this matters:** Passing dimensions to `cmd.png()` corrupts PyMOL's internal view matrix. The Z-distance grows exponentially (from ~120 to ~50000+) after just 3-4 cycles of reinitialize + fetch + png, causing the view to zoom out into invisibility. `cmd.ray()` renders to an offscreen buffer without touching the viewport.
+
+### Quick Snapshot (Preview)
+
+```python
+# Fast OpenGL render (no ray tracing) — good for checking your work
+cmd.draw(1200, 900)
+cmd.png("/path/to/preview.png")
+```
+
+### Saving to a Scratch Directory
+
+When the user hasn't specified where to save, use a scratch directory:
+
+```python
+import os
+scratch = os.path.expanduser("~/.pymol-agent-bridge/scratch")
+os.makedirs(scratch, exist_ok=True)
+cmd.ray(1200, 900)
+cmd.png(scratch + "/snapshot.png")
+```
+
+Then read the image file to show the user what PyMOL is displaying.
+
+### Common Sizes
+
+| Use Case | Ray Size | Notes |
+| -------- | -------- | ----- |
+| Quick check | 800x600 | `cmd.draw()` is fine |
+| Presentation | 1200x900 | Ray trace recommended |
+| Publication | 2400x1800 | Always ray trace |
+
+For full rendering settings (lighting, shadows, antialiasing, DPI), see the **publication-figures** skill.
+
 ## Tips
 
 - Use `cmd.get_names()` to verify objects loaded correctly
