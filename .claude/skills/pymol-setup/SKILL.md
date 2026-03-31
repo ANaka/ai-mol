@@ -11,20 +11,20 @@ Set up Claude Code to work with PyMOL.
 ## Step 1: Check Existing Installation
 
 ```bash
-~/.claudemol/bin/claudemol info 2>/dev/null || echo "NOT CONFIGURED"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge info 2>/dev/null || echo "NOT CONFIGURED"
 ```
 
 Read the output carefully:
-- **If info prints successfully** → claudemol is already installed. Go to Step 3.
+- **If info prints successfully** → pymol-agent-bridge is already installed. Go to Step 3.
 - **If "NOT CONFIGURED"** → Go to Step 2.
 
 ## Step 2: Install (Only If Not Configured)
 
-### Step 2a: Install claudemol (only if not found)
+### Step 2a: Install pymol-agent-bridge (only if not found)
 
 ```bash
-uv pip install claudemol   # if using uv
-pip install claudemol       # otherwise
+uv pip install pymol-agent-bridge   # if using uv
+pip install pymol-agent-bridge       # otherwise
 ```
 
 ### Step 2b: Install PyMOL (only if not found)
@@ -38,23 +38,23 @@ pip install claudemol       # otherwise
 
 Do not assume an installation method.
 
-### Step 2c: Run claudemol setup
+### Step 2c: Run pymol-agent-bridge setup
 
-Run `claudemol setup` using whichever Python has claudemol installed. This configures `~/.pymolrc`, saves the Python path, and creates the wrapper script at `~/.claudemol/bin/claudemol`.
+Run `pymol-agent-bridge setup` using whichever Python has pymol-agent-bridge installed. This configures `~/.pymolrc`, saves the Python path, and creates the wrapper script at `~/.pymol-agent-bridge/bin/pymol-agent-bridge`.
 
 ```bash
-# If claudemol is in the project venv:
-.venv/bin/python -m claudemol.cli setup
+# If pymol-agent-bridge is in the project venv:
+.venv/bin/pymol-agent-bridge setup
 
-# If claudemol is installed globally:
-claudemol setup
+# If pymol-agent-bridge is installed globally:
+pymol-agent-bridge setup
 ```
 
 ## Step 3: Test Connection
 
 ```bash
-~/.claudemol/bin/claudemol launch
-~/.claudemol/bin/claudemol exec "print('Claude connection successful!')"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge launch
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "print('Claude connection successful!')"
 ```
 
 ## Step 4: Configure Permissions (Optional)
@@ -65,7 +65,7 @@ Ask the user if they want seamless PyMOL commands without per-command approval. 
 {
   "permissions": {
     "allow": [
-      "Bash(*/.claudemol/bin/claudemol*)",
+      "Bash(*/.pymol-agent-bridge/bin/pymol-agent-bridge*)",
       "Bash(pymol*)"
     ]
   }
@@ -80,14 +80,14 @@ On success, tell the user:
 - PyMOL is installed and configured
 - The socket plugin will auto-load when PyMOL starts
 - They can say "open PyMOL" or "load <structure>" to start working
-- All commands go through `~/.claudemol/bin/claudemol exec`
+- All commands go through `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec`
 
 ## Troubleshooting
 
 ### "Cannot connect to PyMOL. Is it running?"
 PyMOL isn't running or plugin didn't load:
-1. Run `~/.claudemol/bin/claudemol launch`
-2. In PyMOL console, run `claude_status`
+1. Run `~/.pymol-agent-bridge/bin/pymol-agent-bridge launch`
+2. In PyMOL console, run `bridge_status`
 3. Look for errors in PyMOL console about the plugin
 
 ### "pymol: command not found" after pip install
@@ -105,7 +105,7 @@ The pymol-open-source-whl package doesn't install a `pymol` command. Solutions:
 ### pymolrc not loading
 - Ensure the path in pymolrc is absolute, not relative
 - Check file permissions on the plugin
-- Run `claudemol setup` to auto-configure
+- Run `pymol-agent-bridge setup` to auto-configure
 
 ### PyQt5/GUI issues
 If PyMOL launches but GUI is broken:

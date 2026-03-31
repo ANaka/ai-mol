@@ -14,10 +14,10 @@ All commands go through the CLI wrapper. **Never use raw sockets.**
 
 ```bash
 # Single command
-~/.claudemol/bin/claudemol exec "cmd.fetch('1ubq')"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "cmd.fetch('1ubq')"
 
 # Multiple commands via heredoc
-~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "$(cat <<'PYMOL'
 cmd.hide('everything')
 cmd.show('cartoon')
 cmd.color('spectrum')
@@ -25,7 +25,7 @@ PYMOL
 )"
 
 # Get values back via print()
-~/.claudemol/bin/claudemol exec "print(cmd.get_names())"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "print(cmd.get_names())"
 ```
 
 All `cmd.*` examples below should be sent this way.

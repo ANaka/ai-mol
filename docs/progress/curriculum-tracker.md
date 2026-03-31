@@ -103,7 +103,7 @@ Brief log of learning sessions:
 - Use `cmd.center()` + `cmd.zoom()` instead of `cmd.orient()` for reliable view
 - Add `cmd.refresh()` + `time.sleep(0.5)` before `cmd.png()` to ensure rendering
 - Different PDB structures use different residue names (HEM vs HEC for heme)
-- Updated pymolrc to point to claudemol instead of pymol-mcp
+- Updated pymolrc to point to pymol-agent-bridge instead of pymol-mcp
 - Modified `pymol_session.py` to not double-load plugin if pymolrc loads it
 - Removed `cmd.draw()` from `pymol_view.py` as it caused instability
 
@@ -116,7 +116,7 @@ Brief log of learning sessions:
 **Artifacts Modified:**
 - `pymol_view.py` - Removed cmd.draw(), kept only cmd.ray() for ray-traced
 - `pymol_session.py` - Don't load plugin if pymolrc already loads it
-- `~/.pymolrc` - Updated path from pymol-mcp to claudemol
+- `~/.pymolrc` - Updated path from pymol-mcp to pymol-agent-bridge
 
 **Next:** Complete Tasks 17-20, investigate view inflation bug
 

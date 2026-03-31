@@ -10,11 +10,11 @@ Get Claude controlling PyMOL in 5 minutes.
 
 ## Setup
 
-### 1. Install claudemol
+### 1. Install pymol-agent-bridge
 
 ```bash
-pip install claudemol
-claudemol setup
+pip install pymol-agent-bridge
+pymol-agent-bridge setup
 ```
 
 ### 2. Start Using It
@@ -59,12 +59,12 @@ Claude will launch PyMOL, connect to it, and load the structure.
 ### "Cannot connect to PyMOL"
 
 1. Make sure PyMOL is running
-2. Run `claude_status` in PyMOL's command line to check the listener
-3. Try `claude_stop` then `claude_start` in PyMOL
+2. Run `bridge_status` in PyMOL's command line to check the listener
+3. Try `bridge_stop` then `bridge_start` in PyMOL
 
 ### Plugin Not Loading
 
-1. Run `claudemol setup` again
+1. Run `pymol-agent-bridge setup` again
 2. Check PyMOL's output for errors on startup
 
 ### Need More Help?

@@ -1,4 +1,4 @@
-# claudemol Skills for Claude Code
+# claudemol: PyMOL Skills for Claude Code
 
 PyMOL visualization skills for Claude Code.
 
@@ -13,11 +13,11 @@ Then restart Claude Code.
 
 ## Prerequisites
 
-You need the `claudemol` pip package installed:
+You need the `pymol-agent-bridge` pip package installed:
 
 ```bash
-pip install claudemol
-claudemol setup
+pip install pymol-agent-bridge
+pymol-agent-bridge setup
 ```
 
 ## Available Skills
@@ -30,7 +30,7 @@ claudemol setup
 - **publication-figures** - Creating publication-quality molecular figures
 - **movie-creation** - Animations, rotations, and morphing sequences
 - **pymol-setup** - First-time PyMOL configuration
-- **pymol-connect** - Connecting to PyMOL sessions
+- **pymol** - Launching and connecting to PyMOL sessions
 
 ## Usage
 

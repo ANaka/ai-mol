@@ -8,7 +8,7 @@ version: 0.1.0
 
 Workflows for structural comparison of proteins and other molecules.
 
-> **Send all `cmd.*` code via:** `~/.claudemol/bin/claudemol exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
+> **Send all `cmd.*` code via:** `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "..."` (or heredoc for multi-line). See @pymol-fundamentals for details.
 
 ## Alignment Methods
 

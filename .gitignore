@@ -123,3 +123,4 @@ scratch/
 
 # Ralph loop local state
 .claude/ralph-loop.local.md
+.omc/

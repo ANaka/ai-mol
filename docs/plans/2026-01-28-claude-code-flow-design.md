@@ -43,12 +43,12 @@ Claude Code sends Python/PyMOL commands directly over a TCP socket to PyMOL. No 
 - Starts automatically when PyMOL launches (via pymolrc)
 - Prints one-time message: `"Claude socket listener active on port 9876"`
 - Runs in background, no visible UI
-- User can check status with `claude_status` command
+- User can check status with `bridge_status` command
 
 **Commands exposed to user:**
-- `claude_status` - prints connection state and port
-- `claude_stop` - stops the listener (for debugging/troubleshooting)
-- `claude_start` - restarts the listener
+- `bridge_status` - prints connection state and port
+- `bridge_stop` - stops the listener (for debugging/troubleshooting)
+- `bridge_start` - restarts the listener
 
 **Technical changes:**
 - Remove PyQt5 dependency and window code
@@ -105,7 +105,7 @@ When user asks to open PyMOL (or load a structure, etc.):
 If PyMOL is already open:
 - Attempt connection on port 9876
 - If plugin is running, connected
-- If not (plugin not loaded), inform user and suggest restarting PyMOL or running `claude_start`
+- If not (plugin not loaded), inform user and suggest restarting PyMOL or running `bridge_start`
 
 **Reconnection:**
 
@@ -127,7 +127,7 @@ No special handling needed. User can:
 1. **New plugin** (`claude_socket_plugin.py`)
    - Headless socket listener
    - Auto-start, no window
-   - `claude_status`, `claude_stop`, `claude_start` commands
+   - `bridge_status`, `bridge_stop`, `bridge_start` commands
 
 2. **Setup skill** (`/pymol-setup`)
    - Verifies PyMOL, installs plugin, configures pymolrc, tests connection

@@ -1,26 +1,26 @@
-# claudemol - PyMOL Integration
+# pymol-agent-bridge - PyMOL Integration
 
-claudemol connects Claude to a running PyMOL instance over TCP socket (localhost:9880).
+pymol-agent-bridge connects Claude to a running PyMOL instance over TCP socket (localhost:9880).
 
 ## Connection Rules
 
-1. **Check status first.** The SessionStart hook runs `claudemol status` automatically. Read its output before doing anything.
+1. **Check status first.** The SessionStart hook runs `pymol-agent-bridge status` automatically. Read its output before doing anything.
 2. **Never kill an existing PyMOL session.** If PyMOL is already running, connect to it. Do not launch a new instance.
 3. **Never call `cmd.reinitialize()` unless the user explicitly asks.** This destroys all loaded structures.
 
 ## Canonical Connection Pattern
 
 ```bash
-~/.claudemol/bin/claudemol launch
-~/.claudemol/bin/claudemol exec "cmd.fetch('1ubq')"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge launch
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "cmd.fetch('1ubq')"
 ```
 
-All commands go through `~/.claudemol/bin/claudemol exec`. The wrapper script bakes in the correct Python path — no imports, no venv discovery needed.
+All commands go through `~/.pymol-agent-bridge/bin/pymol-agent-bridge exec`. The wrapper script bakes in the correct Python path — no imports, no venv discovery needed.
 
 For multi-line commands use heredocs:
 
 ```bash
-~/.claudemol/bin/claudemol exec "$(cat <<'PYMOL'
+~/.pymol-agent-bridge/bin/pymol-agent-bridge exec "$(cat <<'PYMOL'
 cmd.hide('everything')
 cmd.show('cartoon')
 cmd.color('spectrum')
@@ -41,7 +41,7 @@ For seamless PyMOL interaction without per-command approval prompts, users can a
 {
   "permissions": {
     "allow": [
-      "Bash(*/.claudemol/bin/claudemol*)",
+      "Bash(*/.pymol-agent-bridge/bin/pymol-agent-bridge*)",
       "Bash(pymol*)"
     ]
   }

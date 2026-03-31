@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/.claudemol/bin/claudemol status 2>/dev/null || echo 'claudemol: not configured (run /pymol-setup)'",
+            "command": "$HOME/.pymol-agent-bridge/bin/pymol-agent-bridge status 2>/dev/null || echo 'pymol-agent-bridge: not configured (run /pymol-setup)'",
             "timeout": 10
           }
         ]

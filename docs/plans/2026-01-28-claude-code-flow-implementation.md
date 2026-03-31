@@ -28,9 +28,9 @@ Auto-starts on load, no UI required.
 
 Usage:
     run /path/to/claude_socket_plugin.py    # Start listening
-    claude_status                            # Check connection status
-    claude_stop                              # Stop listener
-    claude_start                             # Restart listener
+    bridge_status                            # Check connection status
+    bridge_stop                              # Stop listener
+    bridge_start                             # Restart listener
 """
 
 import socket
@@ -167,7 +167,7 @@ class SocketServer:
         return self.running and self.thread and self.thread.is_alive()
 
 
-def claude_status():
+def bridge_status():
     """Print Claude socket listener status."""
     global _server
     if _server and _server.is_running:
@@ -177,7 +177,7 @@ def claude_status():
         print("Claude socket listener: not running")
 
 
-def claude_stop():
+def bridge_stop():
     """Stop the Claude socket listener."""
     global _server
     if _server:
@@ -188,7 +188,7 @@ def claude_stop():
         print("Claude socket listener was not running")
 
 
-def claude_start(port=9876):
+def bridge_start(port=9876):
     """Start the Claude socket listener."""
     global _server, _port
     if _server and _server.is_running:
@@ -200,12 +200,12 @@ def claude_start(port=9876):
 
 
 # Register commands with PyMOL
-cmd.extend("claude_status", claude_status)
-cmd.extend("claude_stop", claude_stop)
-cmd.extend("claude_start", claude_start)
+cmd.extend("bridge_status", bridge_status)
+cmd.extend("bridge_stop", bridge_stop)
+cmd.extend("bridge_start", bridge_start)
 
 # Auto-start on load
-claude_start()
+bridge_start()
 ```
 
 **Step 2: Test plugin manually**
@@ -219,9 +219,9 @@ Expected: See message `Claude socket listener active on port 9876`
 
 Test commands:
 ```
-claude_status
-claude_stop
-claude_start
+bridge_status
+bridge_stop
+bridge_start
 ```
 
 **Step 3: Commit**
@@ -233,7 +233,7 @@ git commit -m "feat: add headless Claude socket plugin
 Replaces Qt-based plugin with headless socket listener.
 - Auto-starts on load
 - No UI dependencies
-- Exposes claude_status, claude_stop, claude_start commands"
+- Exposes bridge_status, bridge_stop, bridge_start commands"
 ```
 
 ---
@@ -551,7 +551,7 @@ Tell the user:
 
 **"Connection refused"**: PyMOL isn't running or plugin didn't load. Check:
 - Is PyMOL running?
-- Run `claude_status` in PyMOL console
+- Run `bridge_status` in PyMOL console
 - Check for errors in PyMOL console
 
 **"pymol: command not found"**: PyMOL not in PATH. User needs to:
@@ -802,9 +802,9 @@ Claude Code → TCP Socket (9876) → PyMOL Plugin
 - `pymol_connection.py` - Python module for socket communication
 
 **PyMOL commands (run in PyMOL console):**
-- `claude_status` - Check if listener is running
-- `claude_stop` - Stop listener
-- `claude_start` - Start listener
+- `bridge_status` - Check if listener is running
+- `bridge_stop` - Stop listener
+- `bridge_start` - Start listener
 ```
 
 **Step 2: Commit**
