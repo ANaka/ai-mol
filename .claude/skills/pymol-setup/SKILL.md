@@ -44,7 +44,7 @@ Run `pymol-agent-bridge setup` using whichever Python has pymol-agent-bridge ins
 
 ```bash
 # If pymol-agent-bridge is in the project venv:
-.venv/bin/python -m pymol-agent-bridge.cli setup
+.venv/bin/pymol-agent-bridge setup
 
 # If pymol-agent-bridge is installed globally:
 pymol-agent-bridge setup

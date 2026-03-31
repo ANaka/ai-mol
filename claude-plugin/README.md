@@ -1,4 +1,4 @@
-# pymol-agent-bridge Skills for Claude Code
+# claudemol: PyMOL Skills for Claude Code
 
 PyMOL visualization skills for Claude Code.
 
@@ -30,7 +30,7 @@ pymol-agent-bridge setup
 - **publication-figures** - Creating publication-quality molecular figures
 - **movie-creation** - Animations, rotations, and morphing sequences
 - **pymol-setup** - First-time PyMOL configuration
-- **pymol-connect** - Connecting to PyMOL sessions
+- **pymol** - Launching and connecting to PyMOL sessions
 
 ## Usage
 

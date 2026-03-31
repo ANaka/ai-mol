@@ -60,9 +60,10 @@ Claude Code → claudemol-skills (Expertise) → pymol-agent-bridge (Plumbing) �
 If you previously used the unified `claudemol` package:
 
 1. Uninstall the old package: `pip uninstall claudemol`
-2. Install the new bridge: `pip install pymol-agent-bridge && pymol-agent-bridge setup`
-3. Update your Claude Code plugin: `/plugin install claudemol-skills` (it will update to the latest version)
-4. Update your `.claude/settings.json` permissions to allow the new bridge path:
+2. Install the new bridge: `pip install pymol-agent-bridge`
+3. Run setup to update `~/.pymolrc` and create the new wrapper: `pymol-agent-bridge setup`
+4. Update your Claude Code plugin: `/plugin install claudemol-skills` (it will update to the latest version)
+5. Update your `.claude/settings.json` permissions to allow the new bridge path:
 
 ```json
 {

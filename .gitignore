@@ -122,4 +122,5 @@ settings.json
 scratch/
 
 # Ralph loop local state
-.claude/ralph-loop.local.md.omc/
+.claude/ralph-loop.local.md
+.omc/
