@@ -13,7 +13,9 @@ test = [
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-addopts = "-m 'not slow'"
+addopts = "-m 'not slow and not sonnet and not opus'"
 markers = [
-    "slow: Agent SDK tests (spawns Claude sessions, costs tokens)",
+    "slow: Agent SDK tests - Haiku (spawns Claude sessions, costs tokens)",
+    "sonnet: Agent SDK tests - Sonnet (higher quality, higher cost)",
+    "opus: Agent SDK tests - Opus (highest quality, highest cost)",
 ]
