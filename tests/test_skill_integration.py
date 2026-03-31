@@ -8,6 +8,7 @@ These tests require:
 They are marked @pytest.mark.slow (excluded from default pytest runs).
 """
 
+import ast
 import os
 import subprocess
 import tempfile
@@ -23,11 +24,15 @@ BRIDGE = os.path.expanduser("~/.pymol-agent-bridge/bin/pymol-agent-bridge")
 # Helpers
 # ---------------------------------------------------------------------------
 
-def bridge_exec(cmd: str) -> str:
-    """Send a command to PyMOL via the bridge and return stdout."""
+def bridge_exec(cmd: str, timeout: int = 60) -> str:
+    """Send a command to PyMOL via the bridge and return stdout.
+
+    Default timeout is 60s to accommodate slow network fetches (e.g., cmd.fetch
+    from RCSB).
+    """
     result = subprocess.run(
         [BRIDGE, "exec", cmd],
-        capture_output=True, text=True, timeout=30,
+        capture_output=True, text=True, timeout=timeout,
     )
     if result.returncode != 0:
         raise RuntimeError(f"Bridge exec failed: {result.stderr}")
@@ -45,10 +50,17 @@ def bridge_status() -> bool:
 
 def pymol_get_names() -> list[str]:
     """Get list of loaded object names in PyMOL."""
+    # Use Python-level eval of the list to handle edge cases (names with
+    # commas, extra whitespace, etc.) safely — the output is always a Python
+    # list literal from cmd.get_names().
     raw = bridge_exec("print(cmd.get_names())")
     if not raw or raw == "[]":
         return []
-    return [s.strip().strip("'\"") for s in raw.strip("[]").split(",")]
+    try:
+        return ast.literal_eval(raw)
+    except (ValueError, SyntaxError):
+        # Fallback: naive split
+        return [s.strip().strip("'\"") for s in raw.strip("[]").split(",")]
 
 
 def pymol_reinitialize():
@@ -166,6 +178,9 @@ class TestImageExport:
 
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = os.path.join(tmpdir, "test_figure.png")
+            # Give Claude the exact output path. This works because PyMOL runs
+            # locally and has access to the same filesystem. The agent sends
+            # cmd.png(path) through pymol-agent-bridge exec.
             await ask_agent(
                 f"Ray trace 1ubq at 800x600 and save as a PNG to {output_path}. "
                 "Use white background.",
