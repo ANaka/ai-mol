@@ -161,14 +161,17 @@ for f in sorted(glob.glob(os.path.join(pred_dir, "*.pdb"))):
 
     results.append((pred_name, mean_plddt, rmsd))
 
-# Sort by combined score (high pLDDT, low RMSD)
-results.sort(key=lambda x: (-x[1], x[2]))
+# Sort by combined score (high pLDDT, low RMSD); unscored entries sort last
+results.sort(key=lambda x: (-x[1], x[2] if x[2] >= 0 else float('inf')))
 print("\nDesign Rankings (pLDDT + self-consistency):")
 print("%-30s  pLDDT   RMSD  Pass?" % "Name")
 print("-" * 60)
 for name, plddt, rmsd in results:
-    passed = "Y" if plddt > 80 and 0 < rmsd < 1.5 else "N"
-    print("%-30s  %5.1f  %5.2f  %s" % (name, plddt, rmsd, passed))
+    if rmsd < 0:
+        print("%-30s  %5.1f    N/A  -" % (name, plddt))
+    else:
+        passed = "Y" if plddt > 80 and rmsd < 1.5 else "N"
+        print("%-30s  %5.1f  %5.2f  %s" % (name, plddt, rmsd, passed))
 ```
 
 ## Iteration Tracking

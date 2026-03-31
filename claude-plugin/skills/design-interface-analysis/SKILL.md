@@ -118,8 +118,18 @@ cmd.color("yellow", "(hydrophobic_A or hydrophobic_B) and elem C")
 cmd.set("dot_solvent", 1)
 cmd.set("dot_density", 3)
 
-sasa_A_alone = cmd.get_area("chain A")
-sasa_B_alone = cmd.get_area("chain B")
+# Measure each chain in isolation by temporarily hiding the partner
+cmd.disable("all")
+cmd.create("tmp_A", "chain A")
+cmd.create("tmp_B", "chain B")
+
+sasa_A_alone = cmd.get_area("tmp_A")
+sasa_B_alone = cmd.get_area("tmp_B")
+
+cmd.delete("tmp_A")
+cmd.delete("tmp_B")
+cmd.enable("all")
+
 sasa_complex = cmd.get_area("chain A or chain B")
 
 bsa = (sasa_A_alone + sasa_B_alone - sasa_complex) / 2.0

@@ -145,7 +145,9 @@ print("Interface residues (binder): %d" % n_contacts)
 
 # H-bonds across interface
 cmd.distance("interface_hbonds", "chain A", "chain B", mode=2)
-n_hbonds = len(cmd.get_raw_alignment("interface_hbonds")) if cmd.count_atoms("interface_hbonds") else 0
+# Count H-bonds from the distance object (each bond = 2 pseudoatoms)
+n_hbonds = cmd.count_atoms("interface_hbonds") // 2
+print("Interface H-bonds: ~%d" % n_hbonds)
 ```
 
 ## Batch Screening

@@ -141,25 +141,30 @@ cmd.show("cartoon")
 # After loading multiple designs, identify consensus positions
 # (positions where all designs agree)
 stored.all_seqs = {}
+stored.all_resi = {}
 for obj in cmd.get_object_list():
     stored.all_seqs[obj] = []
-    cmd.iterate("%s and name CA" % obj, "stored.all_seqs['%s'].append(resn)" % obj)
+    stored.all_resi[obj] = []
+    cmd.iterate("%s and name CA" % obj, "stored.all_seqs['%s'].append(resn); stored.all_resi['%s'].append(resi)" % (obj, obj))
 
 n_designs = len(stored.all_seqs)
-n_positions = len(list(stored.all_seqs.values())[0])
+ref_obj = cmd.get_object_list()[0]
+ref_resi = stored.all_resi[ref_obj]
+n_positions = len(ref_resi)
 consensus = []
 variable = []
 for i in range(n_positions):
     residues = set(seq[i] for seq in stored.all_seqs.values())
     if len(residues) == 1:
-        consensus.append(str(i+1))
+        consensus.append(ref_resi[i])
     else:
-        variable.append(str(i+1))
+        variable.append(ref_resi[i])
 
 # Color: consensus = blue, variable = red
-ref_obj = cmd.get_object_list()[0]
-cmd.color("marine", "%s and resi %s" % (ref_obj, "+".join(consensus)))
-cmd.color("salmon", "%s and resi %s" % (ref_obj, "+".join(variable)))
+if consensus:
+    cmd.color("marine", "%s and resi %s" % (ref_obj, "+".join(consensus)))
+if variable:
+    cmd.color("salmon", "%s and resi %s" % (ref_obj, "+".join(variable)))
 print("Consensus positions: %d/%d (%.0f%%)" % (len(consensus), n_positions, 100*len(consensus)/n_positions))
 ```
 

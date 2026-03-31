@@ -239,18 +239,18 @@ Contig strings specify which residues to keep vs design.
 ```
 A1-80,10,A91-120       # Keep A1-80, design 10, keep A91-120
 50-70,A10-30,20        # Design 50-70 residues, keep A10-30, design 20
-A1-50,\0,B1-50         # Two chains from input
+A1-50,/0,B1-50         # Two chains from input
 A40-60,70,A120-170     # Keep 40-60, design exactly 70, keep 120-170
 ```
 
 ### Reading a Contig
 
-For `A40-60,70,A120-170,A203,\0,B3-45,60-80`:
+For `A40-60,70,A120-170,A203,/0,B3-45,60-80`:
 1. `A40-60`: residues 40-60 from chain A (fixed)
 2. `70`: design exactly 70 new residues
 3. `A120-170`: residues 120-170 from chain A (fixed)
 4. `A203`: single residue 203 from chain A (fixed)
-5. `\0`: chain break (no peptide bond)
+5. `/0`: chain break (no peptide bond)
 6. `B3-45`: residues 3-45 from chain B (fixed)
 7. `60-80`: design 60-80 residues at the end
 
