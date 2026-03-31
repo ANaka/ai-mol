@@ -68,13 +68,7 @@ def pymol_reinitialize():
     bridge_exec("cmd.reinitialize()")
 
 
-async def ask_agent(prompt: str, options) -> str:
-    """Run a Claude Agent SDK query and return the final result text."""
-    result = ""
-    async for message in sdk.query(prompt=prompt, options=options):
-        if isinstance(message, sdk.ResultMessage):
-            result = message.result or ""
-    return result
+from conftest import ask_agent  # noqa: E402
 
 
 # ---------------------------------------------------------------------------
