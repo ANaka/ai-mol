@@ -11,11 +11,11 @@ Set up Claude Code to work with PyMOL.
 ## Step 1: Check Existing Installation
 
 ```bash
-~/.pymol-agent-bridge/bin/pymol-agent-bridge info 2>/dev/null || echo "NOT CONFIGURED"
+~/.pymol-agent-bridge/bin/pymol-agent-bridge info --json 2>/dev/null || echo "NOT CONFIGURED"
 ```
 
 Read the output carefully:
-- **If info prints successfully** → pymol-agent-bridge is already installed. Go to Step 3.
+- **If valid JSON prints** (has `version`, `plugin_path`, `wrapper_path`) → pymol-agent-bridge is already installed. Go to Step 3.
 - **If "NOT CONFIGURED"** → Go to Step 2.
 
 ## Step 2: Install (Only If Not Configured)
