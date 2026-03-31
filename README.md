@@ -50,12 +50,15 @@ The plugin includes specialized skills for common structural biology workflows:
 - **alphafold-validation** - AlphaFold/ESMFold pLDDT coloring, self-consistency RMSD
 - **design-interface-analysis** - Interface contacts, BSA, hotspots, H-bonds
 - **design-comparison** - Batch ranking, before/after overlay, iteration tracking
+- **la-proteina-viz** - La-Proteina config building, generation, and output visualization
+- **proteina-complexa-viz** - Proteina-Complexa binder/ligand/AME pipeline setup and visualization
 
 Design skills compose together for complete workflows:
 ```
-Binder design:     rfd3 → rfdiffusion-viz → proteinmpnn-viz → alphafold-validation → design-interface-analysis
-Motif scaffolding: rfd3 → rfdiffusion-viz → proteinmpnn-viz → alphafold-validation → design-comparison
-Batch QC:          alphafold-validation + design-comparison
+RFdiffusion:          rfd3 → rfdiffusion-viz → proteinmpnn-viz → alphafold-validation → design-interface-analysis
+La-Proteina:          la-proteina-viz → alphafold-validation → design-comparison
+Proteina-Complexa:    proteina-complexa-viz → alphafold-validation → design-interface-analysis
+Batch QC:             alphafold-validation + design-comparison
 ```
 
 ## 🏗️ Architecture
