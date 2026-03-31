@@ -36,6 +36,7 @@ Open PyMOL and run `/pymol-setup` in Claude Code to verify everything is working
 
 The plugin includes specialized skills for common structural biology workflows:
 
+### Visualization & Analysis
 - **pymol-fundamentals** - Basic visualization, selections, coloring
 - **protein-structure-basics** - Secondary structure, B-factor, representations
 - **binding-site-visualization** - Protein-ligand interactions
@@ -45,6 +46,21 @@ The plugin includes specialized skills for common structural biology workflows:
 - **movie-creation** - Animations and rotations
 - **miscellaneous** - Additional patterns and utility commands
 - **pymol-setup** - Guided configuration and troubleshooting
+
+### Protein Design
+- **rfd3** - RFdiffusion3 interactive config builder
+- **rfdiffusion-viz** - RFdiffusion output inspection, trajectories, scaffold QC
+- **proteinmpnn-viz** - ProteinMPNN/LigandMPNN sequence design visualization
+- **alphafold-validation** - AlphaFold/ESMFold pLDDT coloring, self-consistency RMSD
+- **design-interface-analysis** - Interface contacts, BSA, hotspots, H-bonds
+- **design-comparison** - Batch ranking, before/after overlay, iteration tracking
+
+Design skills compose together for complete workflows:
+```
+Binder design:     rfd3 → rfdiffusion-viz → proteinmpnn-viz → alphafold-validation → design-interface-analysis
+Motif scaffolding: rfd3 → rfdiffusion-viz → proteinmpnn-viz → alphafold-validation → design-comparison
+Batch QC:          alphafold-validation + design-comparison
+```
 
 ## 🏗️ Architecture
 
