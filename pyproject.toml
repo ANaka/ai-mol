@@ -6,10 +6,9 @@ requires-python = ">=3.10"
 
 [project.optional-dependencies]
 test = [
+    "claude-agent-sdk",
     "pytest",
     "pytest-asyncio",
-    # claude-agent-sdk — not yet available on PyPI as of 2026-03-30.
-    # When published, add here and uncomment Agent SDK tests.
 ]
 
 [tool.pytest.ini_options]
