@@ -6,7 +6,7 @@ It provides Claude with the expertise to perform complex PyMOL workflows—from 
 
 ## 🚀 Powered by `pymol-agent-bridge`
 
-This repository is now **skills-only**. All core infrastructure (socket communication, session management, and CLI) has been moved to the [pymol-agent-bridge](https://github.com/ANaka/pymol-agent-bridge) project— a lightweight, agent-agnostic bridge for PyMOL.
+This repository is **skills-only**. To talk to pymol it depends on a lightweight python library/CLI, [pymol-agent-bridge](https://github.com/ANaka/pymol-agent-bridge).
 
 ## 🛠️ Installation
 
