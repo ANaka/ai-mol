@@ -57,6 +57,16 @@ def parse_frontmatter(path: pathlib.Path) -> dict | None:
     return frontmatter
 
 
+def extract_skill_refs(text: str) -> set[str]:
+    """Extract @skill-name cross-references from text.
+
+    Matches patterns like @pymol-fundamentals, @alphafold-validation, etc.
+    Excludes email-like patterns (word@word) by requiring start-of-line or whitespace.
+    """
+    matches = re.findall(r"(?:^|[\s(,])@([a-z][a-z0-9-]+)", text, re.MULTILINE)
+    return set(matches)
+
+
 def extract_bridge_subcommands(text: str) -> set[str]:
     """Extract pymol-agent-bridge subcommands from text.
 
